@@ -1,0 +1,664 @@
+{
+    "socail-network": {
+        "name": "socail-network",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/tools",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/doc",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/common",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/statistics_server",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/content_service",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/social_network_api",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/tools": {
+        "name": "socail-network/tools",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/tools/database-dev",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/tools/kafka-dev",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/tools/database-dev": {
+        "name": "socail-network/tools/database-dev",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/tools/database-dev/configs",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/tools/database-dev/configs": {
+        "name": "socail-network/tools/database-dev/configs",
+        "type": "directory",
+        "links": []
+    },
+    "socail-network/tools/kafka-dev": {
+        "name": "socail-network/tools/kafka-dev",
+        "type": "directory",
+        "links": []
+    },
+    "socail-network/doc": {
+        "name": "socail-network/doc",
+        "type": "directory",
+        "links": []
+    },
+    "socail-network/common": {
+        "name": "socail-network/common",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/common/post_grpc",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/common/kafka_managers",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/common/base_orm_model.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/common/base_orm_model.py": {
+        "name": "socail-network/common/base_orm_model.py",
+        "type": "file",
+        "links": []
+    },
+    "socail-network/common/post_grpc": {
+        "name": "socail-network/common/post_grpc",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/common/post_grpc/protobufs",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/common/post_grpc/content_pb2.py",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/common/post_grpc/content_pb2_grpc.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/common/post_grpc/content_pb2.py": {
+        "name": "socail-network/common/post_grpc/content_pb2.py",
+        "type": "file",
+        "links": []
+    },
+    "socail-network/common/post_grpc/content_pb2_grpc.py": {
+        "name": "socail-network/common/post_grpc/content_pb2_grpc.py",
+        "type": "file",
+        "links": [
+            {
+                "id": "socail-network/common/post_grpc/content_pb2.py",
+                "type": "use"
+            }
+        ]
+    },
+    "socail-network/common/post_grpc/protobufs": {
+        "name": "socail-network/common/post_grpc/protobufs",
+        "type": "directory",
+        "links": []
+    },
+    "socail-network/common/kafka_managers": {
+        "name": "socail-network/common/kafka_managers",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/common/kafka_managers/producer.py",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/common/kafka_managers/consumer.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/common/kafka_managers/producer.py": {
+        "name": "socail-network/common/kafka_managers/producer.py",
+        "type": "file",
+        "links": []
+    },
+    "socail-network/common/kafka_managers/consumer.py": {
+        "name": "socail-network/common/kafka_managers/consumer.py",
+        "type": "file",
+        "links": []
+    },
+    "socail-network/statistics_server": {
+        "name": "socail-network/statistics_server",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/statistics_server/migrations",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/statistics_server/src",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/statistics_server/migrations": {
+        "name": "socail-network/statistics_server/migrations",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/statistics_server/migrations/changesets",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/statistics_server/migrations/changesets": {
+        "name": "socail-network/statistics_server/migrations/changesets",
+        "type": "directory",
+        "links": []
+    },
+    "socail-network/statistics_server/src": {
+        "name": "socail-network/statistics_server/src",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/statistics_server/src/utils",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/statistics_server/src/kafka",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/statistics_server/src/models",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/statistics_server/src/api.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/statistics_server/src/api.py": {
+        "name": "socail-network/statistics_server/src/api.py",
+        "type": "file",
+        "links": [
+            {
+                "id": "socail-network/statistics_server/src/kafka/callback_functions.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/statistics_server/src/kafka/entities.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/statistics_server/src/models/dto.py",
+                "type": "use"
+            }
+        ]
+    },
+    "socail-network/statistics_server/src/utils": {
+        "name": "socail-network/statistics_server/src/utils",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/statistics_server/src/utils/session_maker.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/statistics_server/src/utils/session_maker.py": {
+        "name": "socail-network/statistics_server/src/utils/session_maker.py",
+        "type": "file",
+        "links": []
+    },
+    "socail-network/statistics_server/src/kafka": {
+        "name": "socail-network/statistics_server/src/kafka",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/statistics_server/src/kafka/entities.py",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/statistics_server/src/kafka/callback_functions.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/statistics_server/src/kafka/entities.py": {
+        "name": "socail-network/statistics_server/src/kafka/entities.py",
+        "type": "file",
+        "links": [
+            {
+                "id": "socail-network/common/kafka_managers/consumer.py",
+                "type": "use"
+            }
+        ]
+    },
+    "socail-network/statistics_server/src/kafka/callback_functions.py": {
+        "name": "socail-network/statistics_server/src/kafka/callback_functions.py",
+        "type": "file",
+        "links": [
+            {
+                "id": "socail-network/statistics_server/src/models/dao.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/statistics_server/src/models/dto.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/statistics_server/src/utils/session_maker.py",
+                "type": "use"
+            }
+        ]
+    },
+    "socail-network/statistics_server/src/models": {
+        "name": "socail-network/statistics_server/src/models",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/statistics_server/src/models/dto.py",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/statistics_server/src/models/dao.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/statistics_server/src/models/dto.py": {
+        "name": "socail-network/statistics_server/src/models/dto.py",
+        "type": "file",
+        "links": []
+    },
+    "socail-network/statistics_server/src/models/dao.py": {
+        "name": "socail-network/statistics_server/src/models/dao.py",
+        "type": "file",
+        "links": [
+            {
+                "id": "socail-network/common/base_orm_model.py",
+                "type": "use"
+            }
+        ]
+    },
+    "socail-network/content_service": {
+        "name": "socail-network/content_service",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/content_service/migrations",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/content_service/src",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/content_service/migrations": {
+        "name": "socail-network/content_service/migrations",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/content_service/migrations/changesets",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/content_service/migrations/changesets": {
+        "name": "socail-network/content_service/migrations/changesets",
+        "type": "directory",
+        "links": []
+    },
+    "socail-network/content_service/src": {
+        "name": "socail-network/content_service/src",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/content_service/src/utils",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/content_service/src/models",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/content_service/src/api.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/content_service/src/api.py": {
+        "name": "socail-network/content_service/src/api.py",
+        "type": "file",
+        "links": [
+            {
+                "id": "socail-network/common/post_grpc/content_pb2_grpc.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/content_service/src/models/dao.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/content_service/src/utils/session_maker.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/common/post_grpc/content_pb2.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/common/post_grpc/content_pb2_grpc.py",
+                "type": "use"
+            }
+        ]
+    },
+    "socail-network/content_service/src/utils": {
+        "name": "socail-network/content_service/src/utils",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/content_service/src/utils/session_maker.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/content_service/src/utils/session_maker.py": {
+        "name": "socail-network/content_service/src/utils/session_maker.py",
+        "type": "file",
+        "links": []
+    },
+    "socail-network/content_service/src/models": {
+        "name": "socail-network/content_service/src/models",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/content_service/src/models/dao.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/content_service/src/models/dao.py": {
+        "name": "socail-network/content_service/src/models/dao.py",
+        "type": "file",
+        "links": [
+            {
+                "id": "socail-network/common/base_orm_model.py",
+                "type": "use"
+            }
+        ]
+    },
+    "socail-network/social_network_api": {
+        "name": "socail-network/social_network_api",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/social_network_api/migrations",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/social_network_api/src",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/social_network_api/migrations": {
+        "name": "socail-network/social_network_api/migrations",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/social_network_api/migrations/changesets",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/social_network_api/migrations/changesets": {
+        "name": "socail-network/social_network_api/migrations/changesets",
+        "type": "directory",
+        "links": []
+    },
+    "socail-network/social_network_api/src": {
+        "name": "socail-network/social_network_api/src",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/social_network_api/src/grpc_client",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/social_network_api/src/utils",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/social_network_api/src/kafka",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/social_network_api/src/models",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/social_network_api/src/routers",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/social_network_api/src/api.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/social_network_api/src/api.py": {
+        "name": "socail-network/social_network_api/src/api.py",
+        "type": "file",
+        "links": [
+            {
+                "id": "socail-network/social_network_api/src/kafka/entities.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/social_network_api/src/models/dao.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/social_network_api/src/models/dto.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/social_network_api/src/routers/statistics.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/social_network_api/src/utils/session_maker.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/social_network_api/src/routers/post.py",
+                "type": "use"
+            }
+        ]
+    },
+    "socail-network/social_network_api/src/grpc_client": {
+        "name": "socail-network/social_network_api/src/grpc_client",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/social_network_api/src/grpc_client/post",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/social_network_api/src/grpc_client/post": {
+        "name": "socail-network/social_network_api/src/grpc_client/post",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/social_network_api/src/grpc_client/post/post_client_api.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/social_network_api/src/grpc_client/post/post_client_api.py": {
+        "name": "socail-network/social_network_api/src/grpc_client/post/post_client_api.py",
+        "type": "file",
+        "links": [
+            {
+                "id": "socail-network/common/post_grpc/content_pb2.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/common/post_grpc/content_pb2_grpc.py",
+                "type": "use"
+            }
+        ]
+    },
+    "socail-network/social_network_api/src/utils": {
+        "name": "socail-network/social_network_api/src/utils",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/social_network_api/src/utils/session_maker.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/social_network_api/src/utils/session_maker.py": {
+        "name": "socail-network/social_network_api/src/utils/session_maker.py",
+        "type": "file",
+        "links": []
+    },
+    "socail-network/social_network_api/src/kafka": {
+        "name": "socail-network/social_network_api/src/kafka",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/social_network_api/src/kafka/entities.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/social_network_api/src/kafka/entities.py": {
+        "name": "socail-network/social_network_api/src/kafka/entities.py",
+        "type": "file",
+        "links": [
+            {
+                "id": "socail-network/common/kafka_managers/producer.py",
+                "type": "use"
+            }
+        ]
+    },
+    "socail-network/social_network_api/src/models": {
+        "name": "socail-network/social_network_api/src/models",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/social_network_api/src/models/dto.py",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/social_network_api/src/models/dao.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/social_network_api/src/models/dto.py": {
+        "name": "socail-network/social_network_api/src/models/dto.py",
+        "type": "file",
+        "links": []
+    },
+    "socail-network/social_network_api/src/models/dao.py": {
+        "name": "socail-network/social_network_api/src/models/dao.py",
+        "type": "file",
+        "links": [
+            {
+                "id": "socail-network/common/base_orm_model.py",
+                "type": "use"
+            }
+        ]
+    },
+    "socail-network/social_network_api/src/routers": {
+        "name": "socail-network/social_network_api/src/routers",
+        "type": "directory",
+        "links": [
+            {
+                "id": "socail-network/social_network_api/src/routers/statistics.py",
+                "type": "contain"
+            },
+            {
+                "id": "socail-network/social_network_api/src/routers/post.py",
+                "type": "contain"
+            }
+        ]
+    },
+    "socail-network/social_network_api/src/routers/statistics.py": {
+        "name": "socail-network/social_network_api/src/routers/statistics.py",
+        "type": "file",
+        "links": [
+            {
+                "id": "socail-network/common/kafka_managers/producer.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/social_network_api/src/kafka/entities.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/social_network_api/src/models/dao.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/social_network_api/src/utils/session_maker.py",
+                "type": "use"
+            }
+        ]
+    },
+    "socail-network/social_network_api/src/routers/post.py": {
+        "name": "socail-network/social_network_api/src/routers/post.py",
+        "type": "file",
+        "links": [
+            {
+                "id": "socail-network/social_network_api/src/models/dao.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/social_network_api/src/models/dto.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/social_network_api/src/utils/session_maker.py",
+                "type": "use"
+            },
+            {
+                "id": "socail-network/social_network_api/src/grpc_client/post/post_client_api.py",
+                "type": "use"
+            }
+        ]
+    }
+}
