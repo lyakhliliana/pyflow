@@ -1,4 +1,4 @@
-from src.ui.interfacе import ParserApp
+from src.ui.interface import ParserApp
 
 
 if __name__ == "__main__":
