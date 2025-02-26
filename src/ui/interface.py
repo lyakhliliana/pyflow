@@ -14,7 +14,7 @@ class ParserApp:
         self.mode_combobox = ttk.Combobox(
             self.root,
             textvariable=self.mode_var,
-            values=["full", "object_links", "struct"],
+            values=["full", "object_links", "struct", "file_links"],
             state="readonly",
             width=15
         )

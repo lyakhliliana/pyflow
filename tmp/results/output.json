@@ -1,203 +1,122 @@
 {
-    "pyflow/main.py#body": {
-        "type": "body",
+    "pyflow/main.py": {
+        "name": "pyflow/main.py",
         "links": [
             {
-                "id": "pyflow/src/ui/interface.py#ParserApp",
+                "id": "pyflow/src/ui/interface.py",
                 "type": "use"
             }
         ],
-        "name": "pyflow/main.py#body"
+        "type": "file"
     },
-    "pyflow/exp/ast_exp.py#ast_to_dict": {
-        "type": "func",
+    "pyflow/src/filter.py": {
+        "name": "pyflow/src/filter.py",
         "links": [
             {
-                "id": "pyflow/exp/ast_exp.py#ast_to_dict",
+                "id": "pyflow/src/entities/common/edge.py",
+                "type": "use"
+            },
+            {
+                "id": "pyflow/src/entities/common/graph.py",
                 "type": "use"
             }
         ],
-        "name": "pyflow/exp/ast_exp.py#ast_to_dict"
+        "type": "file"
     },
-    "pyflow/exp/ast_exp.py#body": {
-        "type": "body",
-        "links": [],
-        "name": "pyflow/exp/ast_exp.py#body"
-    },
-    "pyflow/src/filter.py#FilterMode": {
-        "type": "class",
-        "links": [],
-        "name": "pyflow/src/filter.py#FilterMode"
-    },
-    "pyflow/src/filter.py#Filter": {
-        "type": "class",
+    "pyflow/src/parser.py": {
+        "name": "pyflow/src/parser.py",
         "links": [
             {
-                "id": "pyflow/src/entities/common/graph.py#Graph",
+                "id": "pyflow/src/entities/common/node.py",
+                "type": "use"
+            },
+            {
+                "id": "pyflow/src/entities/file.py",
+                "type": "use"
+            },
+            {
+                "id": "pyflow/src/entities/common/graph.py",
+                "type": "use"
+            },
+            {
+                "id": "pyflow/src/entities/imports.py",
                 "type": "use"
             }
         ],
-        "name": "pyflow/src/filter.py#Filter"
+        "type": "file"
     },
-    "pyflow/src/filter.py#body": {
-        "type": "body",
+    "pyflow/src/settings.py": {
+        "name": "pyflow/src/settings.py",
         "links": [],
-        "name": "pyflow/src/filter.py#body"
+        "type": "file"
     },
-    "pyflow/src/parser.py#Parser": {
-        "type": "class",
+    "pyflow/src/project_analyzer.py": {
+        "name": "pyflow/src/project_analyzer.py",
         "links": [
             {
-                "id": "pyflow/src/entities/common/node.py#BaseNode",
+                "id": "pyflow/src/utils/repo_manager/git_manager.py",
                 "type": "use"
             },
             {
-                "id": "pyflow/src/entities/file.py#FileNode",
-                "type": "use"
-            },
-            {
-                "id": "pyflow/src/entities/common/graph.py#Graph",
-                "type": "use"
-            },
-            {
-                "id": "pyflow/src/entities/imports.py#Import",
-                "type": "use"
-            },
-            {
-                "id": "pyflow/src/parser.py#_get_body_usage",
-                "type": "use"
-            },
-            {
-                "id": "pyflow/src/parser.py#_get_class_usage",
-                "type": "use"
-            },
-            {
-                "id": "pyflow/src/parser.py#_get_function_usage",
-                "type": "use"
-            },
-            {
-                "id": "pyflow/src/parser.py#_get_object_name",
+                "id": "pyflow/src/parser.py",
                 "type": "use"
             }
         ],
-        "name": "pyflow/src/parser.py#Parser"
+        "type": "file"
     },
-    "pyflow/src/parser.py#_get_object_name": {
-        "type": "func",
-        "links": [],
-        "name": "pyflow/src/parser.py#_get_object_name"
-    },
-    "pyflow/src/parser.py#_get_class_usage": {
-        "type": "func",
-        "links": [],
-        "name": "pyflow/src/parser.py#_get_class_usage"
-    },
-    "pyflow/src/parser.py#_get_function_usage": {
-        "type": "func",
-        "links": [],
-        "name": "pyflow/src/parser.py#_get_function_usage"
-    },
-    "pyflow/src/parser.py#_get_body_usage": {
-        "type": "func",
-        "links": [],
-        "name": "pyflow/src/parser.py#_get_body_usage"
-    },
-    "pyflow/src/settings.py#body": {
-        "type": "body",
-        "links": [],
-        "name": "pyflow/src/settings.py#body"
-    },
-    "pyflow/src/project_analyzer.py#ProjectAnalyzerSettings": {
-        "type": "class",
-        "links": [],
-        "name": "pyflow/src/project_analyzer.py#ProjectAnalyzerSettings"
-    },
-    "pyflow/src/project_analyzer.py#ProjectAnalyzer": {
-        "type": "class",
+    "pyflow/src/ui/interface.py": {
+        "name": "pyflow/src/ui/interface.py",
         "links": [
             {
-                "id": "pyflow/src/utils/repo_manager/git_manager.py#GitManager",
-                "type": "use"
-            },
-            {
-                "id": "pyflow/src/parser.py#Parser",
-                "type": "use"
-            },
-            {
-                "id": "pyflow/src/project_analyzer.py#ProjectAnalyzerSettings",
+                "id": "pyflow/src/project_analyzer.py",
                 "type": "use"
             }
         ],
-        "name": "pyflow/src/project_analyzer.py#ProjectAnalyzer"
+        "type": "file"
     },
-    "pyflow/src/ui/interface.py#ParserApp": {
-        "type": "class",
+    "pyflow/src/utils/repo_manager/base_manager.py": {
+        "name": "pyflow/src/utils/repo_manager/base_manager.py",
+        "links": [],
+        "type": "file"
+    },
+    "pyflow/src/utils/repo_manager/git_manager.py": {
+        "name": "pyflow/src/utils/repo_manager/git_manager.py",
+        "links": [],
+        "type": "file"
+    },
+    "pyflow/src/utils/repo_manager/dir_manager.py": {
+        "name": "pyflow/src/utils/repo_manager/dir_manager.py",
+        "links": [],
+        "type": "file"
+    },
+    "pyflow/src/entities/file.py": {
+        "name": "pyflow/src/entities/file.py",
+        "links": [],
+        "type": "file"
+    },
+    "pyflow/src/entities/imports.py": {
+        "name": "pyflow/src/entities/imports.py",
+        "links": [],
+        "type": "file"
+    },
+    "pyflow/src/entities/common/edge.py": {
+        "name": "pyflow/src/entities/common/edge.py",
+        "links": [],
+        "type": "file"
+    },
+    "pyflow/src/entities/common/node.py": {
+        "name": "pyflow/src/entities/common/node.py",
+        "links": [],
+        "type": "file"
+    },
+    "pyflow/src/entities/common/graph.py": {
+        "name": "pyflow/src/entities/common/graph.py",
         "links": [
             {
-                "id": "pyflow/src/project_analyzer.py#ProjectAnalyzer",
+                "id": "pyflow/src/entities/common/edge.py",
                 "type": "use"
             }
         ],
-        "name": "pyflow/src/ui/interface.py#ParserApp"
-    },
-    "pyflow/src/utils/repo_manager/base_manager.py#BaseManager": {
-        "type": "class",
-        "links": [],
-        "name": "pyflow/src/utils/repo_manager/base_manager.py#BaseManager"
-    },
-    "pyflow/src/utils/repo_manager/git_manager.py#GitManager": {
-        "type": "class",
-        "links": [],
-        "name": "pyflow/src/utils/repo_manager/git_manager.py#GitManager"
-    },
-    "pyflow/src/utils/repo_manager/dir_manager.py#DirManager": {
-        "type": "class",
-        "links": [],
-        "name": "pyflow/src/utils/repo_manager/dir_manager.py#DirManager"
-    },
-    "pyflow/src/entities/file.py#FileNode": {
-        "type": "class",
-        "links": [],
-        "name": "pyflow/src/entities/file.py#FileNode"
-    },
-    "pyflow/src/entities/imports.py#TypeImport": {
-        "type": "class",
-        "links": [],
-        "name": "pyflow/src/entities/imports.py#TypeImport"
-    },
-    "pyflow/src/entities/imports.py#Import": {
-        "type": "class",
-        "links": [],
-        "name": "pyflow/src/entities/imports.py#Import"
-    },
-    "pyflow/src/entities/common/edge.py#TypeEdge": {
-        "type": "class",
-        "links": [],
-        "name": "pyflow/src/entities/common/edge.py#TypeEdge"
-    },
-    "pyflow/src/entities/common/edge.py#Edge": {
-        "type": "class",
-        "links": [],
-        "name": "pyflow/src/entities/common/edge.py#Edge"
-    },
-    "pyflow/src/entities/common/node.py#TypeNode": {
-        "type": "class",
-        "links": [],
-        "name": "pyflow/src/entities/common/node.py#TypeNode"
-    },
-    "pyflow/src/entities/common/node.py#BaseNode": {
-        "type": "class",
-        "links": [],
-        "name": "pyflow/src/entities/common/node.py#BaseNode"
-    },
-    "pyflow/src/entities/common/graph.py#Graph": {
-        "type": "class",
-        "links": [
-            {
-                "id": "pyflow/src/entities/common/edge.py#Edge",
-                "type": "use"
-            }
-        ],
-        "name": "pyflow/src/entities/common/graph.py#Graph"
+        "type": "file"
     }
 }

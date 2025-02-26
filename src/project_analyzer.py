@@ -6,7 +6,7 @@ from src.utils.repo_manager.git_manager import GitManager
 
 
 class ProjectAnalyzerSettings:
-    ignored_directories: List[str] = ['venv', '.git', 'tmp', 'view']
+    ignored_directories: List[str] = ['venv', '.git', 'tmp', 'view', 'exp']
     filter_mode: str = FilterMode.OBJECT_LINKS
     link_from_git: bool = False
 
@@ -53,4 +53,4 @@ class ProjectAnalyzer:
 
         # Настройка визуализации
         net.show_buttons(filter_=['physics'])
-        net.show("view/pyvis/graph.html")
+        net.show("tmp/results/graph.html")
