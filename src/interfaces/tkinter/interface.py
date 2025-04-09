@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
-from src.project_analyzer import ProjectAnalyzer
+from src.core.parsing.git_handler import GitHandler
+from src.core.parsing.project_parser import ProjectParser
+from interfaces.html.html import HtmlGraphBuilder
 
 
 class ParserApp:
@@ -44,8 +46,14 @@ class ParserApp:
         url = self.url_entry.get()
         if url:
             self.show_status("URL processed successfully!")
-            analyzer = ProjectAnalyzer(link_from_git=True, filter_mode=mode)
-            analyzer.process_project(link=url)
+
+            gh = GitHandler()
+            path = gh.clone_repo(url)
+
+            parser = ProjectParser(path)
+            graph = parser.parse_project()
+            parser.save_graph("tmp/results/output.json")
+            HtmlGraphBuilder().apply_filter_and_save(graph, mode)
             self.show_status("Result saved!")
         else:
             messagebox.showwarning(
@@ -55,8 +63,10 @@ class ParserApp:
         directory = filedialog.askdirectory()
         if directory:
             self.show_status("Directory processed successfully!")
-            analyzer = ProjectAnalyzer(filter_mode=mode)
-            analyzer.process_project(path=directory)
+            parser = ProjectParser(directory)
+            graph = parser.parse_project()
+            parser.save_graph("tmp/results/output.json")
+            HtmlGraphBuilder().apply_filter_and_save(graph, mode)
             self.show_status("Result saved!")
         else:
             messagebox.showwarning(

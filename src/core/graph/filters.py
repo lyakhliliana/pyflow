@@ -1,6 +1,6 @@
-from src.entities.common.graph import Graph
-from src.entities.common.edge import Edge, TypeEdge
-from src.entities.common.node import TypeNode
+from src.core.models.graph import Graph
+from src.core.models.edge import Edge, TypeEdge
+from src.core.models.node import TypeNode
 
 
 class FilterMode:
@@ -22,9 +22,9 @@ class Filter:
 
         for _, node in filtered_graph.nodes.items():
             filtered_links = [
-                link for link in node.links if link.type in [
+                link for link in node.edges if link.type in [
                     TypeEdge.USE] and link.id in filtered_graph.nodes]
-            node.links = filtered_links
+            node.edges = filtered_links
 
         return filtered_graph
 
@@ -33,9 +33,9 @@ class Filter:
         filtered_graph = Graph()
 
         for _, node in graph.nodes.items():
-            filtered_links = [link for link in node.links if link.type in [
+            filtered_links = [link for link in node.edges if link.type in [
                 TypeEdge.CONTAIN] and link.id in graph.nodes]
-            node.links = filtered_links
+            node.edges = filtered_links
             filtered_graph.add_node(node)
 
         return filtered_graph
@@ -45,8 +45,8 @@ class Filter:
         filtered_graph = Graph()
 
         for _, node in graph.nodes.items():
-            filtered_links = [link for link in node.links if link.id in graph.nodes]
-            node.links = filtered_links
+            filtered_links = [link for link in node.edges if link.id in graph.nodes]
+            node.edges = filtered_links
             filtered_graph.add_node(node)
 
         return filtered_graph
@@ -61,14 +61,14 @@ class Filter:
 
         for _, node in filtered_graph.nodes.items():
             new_links = set()
-            for link in node.links:
+            for link in node.edges:
                 cur_object = graph.nodes[link.id]
-                for object_link in cur_object.links:
+                for object_link in cur_object.edges:
                     file_where_object_exist = object_link.id.split('#')[0]
                     if object_link.type == TypeEdge.USE and node.name != file_where_object_exist:
                         new_links.add(file_where_object_exist)
                     
-            node.links = [Edge(link, TypeEdge.USE) for link in new_links]
+            node.edges = [Edge(link, TypeEdge.USE) for link in new_links]
 
         return filtered_graph
 
