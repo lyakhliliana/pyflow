@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
 from core.utils.git_handler import GitHandler
-from src.core.code_parsing.project import ProjectParser
+from src.core.code_parsing.project import ProjectCodeParser
 from interfaces.html.html import HtmlGraphBuilder
 
 
@@ -50,7 +50,7 @@ class ParserApp:
             gh = GitHandler()
             path = gh.clone_repo(url)
 
-            parser = ProjectParser(path)
+            parser = ProjectCodeParser(path)
             graph = parser.parse_project()
             parser.save_graph("tmp/results/output.json")
             HtmlGraphBuilder().apply_filter_and_save(graph, mode)
@@ -63,7 +63,7 @@ class ParserApp:
         directory = filedialog.askdirectory()
         if directory:
             self.show_status("Directory processed successfully!")
-            parser = ProjectParser(directory)
+            parser = ProjectCodeParser(directory)
             graph = parser.parse_project()
             parser.save_graph("tmp/results/output.json")
             HtmlGraphBuilder().apply_filter_and_save(graph, mode)

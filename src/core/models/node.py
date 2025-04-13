@@ -12,6 +12,8 @@ class TypeNode:
     FUNC = 'func'
     BODY = 'body'
 
+    model = 'model'
+
 
 @dataclass
 class MetaInfo:

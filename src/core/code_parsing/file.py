@@ -13,7 +13,7 @@ from src.core.models.graph import Graph
 logger = logging.getLogger(__name__)
 
 
-class FileParser:
+class FileCodeParser:
     def __init__(self, file_node_name: str, file_path: Path, project_path: Path, graph: Graph):
         self.file_node_name = file_node_name
         self.file_path = file_path

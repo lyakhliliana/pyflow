@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List
 import os
 
-from src.core.code_parsing.file import FileParser
+from src.core.code_parsing.file import FileCodeParser
 from src.core.models.edge import TypeEdge
 from src.core.models.node import Node, TypeNode
 from src.core.models.graph import Graph
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 ROOT_NODE_NAME = "root"
 
 
-class ProjectParser:
+class ProjectCodeParser:
     def __init__(self, project_path: str, ignored_directories: list = ["venv", "tmp"]):
         self.project_path = Path(project_path).resolve()
         self.graph = Graph()
@@ -91,7 +91,7 @@ class ProjectParser:
         rel_path = file_path.relative_to(self.project_path)
         file_node_name = str(rel_path)
 
-        visitor = FileParser(file_node_name, file_path, self.project_path, self.graph)
+        visitor = FileCodeParser(file_node_name, file_path, self.project_path, self.graph)
         return visitor.parse()
 
     def _analyze_usages(self):

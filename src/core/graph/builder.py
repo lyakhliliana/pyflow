@@ -181,7 +181,7 @@ class GraphDataCSV(IGraphData):
             reader = csv.DictReader(f)
             for row_num, row in enumerate(reader, 1):
                 try:
-                    node = GraphBuilder._parse_node_row(row)
+                    node = GraphDataCSV._parse_node_row(row)
 
                     if update_mode and node.id in graph:
                         logger.info(f"Строка {row_num}: Узел {node.id} уже существует - пропуск")
@@ -199,7 +199,7 @@ class GraphDataCSV(IGraphData):
             reader = csv.DictReader(f)
             for row_num, row in enumerate(reader, 1):
                 try:
-                    source_id, target_id, edge_type = GraphBuilder._parse_edge_row(row)
+                    source_id, target_id, edge_type = GraphDataCSV._parse_edge_row(row)
 
                     if source_id in graph and target_id in graph:
                         success = graph.add_edge(source_id, target_id, edge_type)
