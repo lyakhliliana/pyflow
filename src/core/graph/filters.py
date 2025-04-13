@@ -33,8 +33,7 @@ class Filter:
         filtered_graph = Graph()
 
         for _, node in graph.nodes.items():
-            filtered_links = [link for link in node.edges if link.type in [
-                TypeEdge.CONTAIN] and link.id in graph.nodes]
+            filtered_links = [link for link in node.edges if link.type in [TypeEdge.CONTAIN] and link.id in graph.nodes]
             node.edges = filtered_links
             filtered_graph.add_node(node)
 
@@ -50,7 +49,7 @@ class Filter:
             filtered_graph.add_node(node)
 
         return filtered_graph
-    
+
     @staticmethod
     def get_files_links(graph: Graph) -> Graph:
         filtered_graph = Graph()
@@ -65,9 +64,9 @@ class Filter:
                 cur_object = graph.nodes[link.id]
                 for object_link in cur_object.edges:
                     file_where_object_exist = object_link.id.split('#')[0]
-                    if object_link.type == TypeEdge.USE and node.name != file_where_object_exist:
+                    if object_link.type == TypeEdge.USE and node.id != file_where_object_exist:
                         new_links.add(file_where_object_exist)
-                    
+
             node.edges = [Edge(link, TypeEdge.USE) for link in new_links]
 
         return filtered_graph

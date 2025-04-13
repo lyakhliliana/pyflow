@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 
-class TypeEdge:
+class TypeEdge(str):
     USE = 'use'
     CONTAIN = 'contain'
 

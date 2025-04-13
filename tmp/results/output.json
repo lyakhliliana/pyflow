@@ -2,7 +2,652 @@
     ".": {
         "name": ".",
         "type": "directory",
+        "edges": [
+            {
+                "id": "main.py",
+                "type": "contain"
+            },
+            {
+                "id": "exp",
+                "type": "contain"
+            },
+            {
+                "id": "src",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "main.py": {
+        "name": "main.py",
+        "type": "file",
         "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "exp": {
+        "name": "exp",
+        "type": "directory",
+        "edges": [
+            {
+                "id": "exp/parser.py",
+                "type": "contain"
+            },
+            {
+                "id": "exp/ast_exp.py",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "exp/parser.py": {
+        "name": "exp/parser.py",
+        "type": "file",
+        "edges": [
+            {
+                "id": "exp/parser.py#Parser",
+                "type": "contain"
+            },
+            {
+                "id": "exp/parser.py#_get_object_name",
+                "type": "contain"
+            },
+            {
+                "id": "exp/parser.py#_get_class_usage",
+                "type": "contain"
+            },
+            {
+                "id": "exp/parser.py#_get_function_usage",
+                "type": "contain"
+            },
+            {
+                "id": "exp/parser.py#_get_body_usage",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "exp/parser.py#Parser": {
+        "name": "exp/parser.py#Parser",
+        "type": "class",
+        "edges": [
+            {
+                "id": "exp/parser.py#_get_body_usage",
+                "type": "use"
+            },
+            {
+                "id": "exp/parser.py#_get_object_name",
+                "type": "use"
+            },
+            {
+                "id": "exp/parser.py#_get_function_usage",
+                "type": "use"
+            },
+            {
+                "id": "exp/parser.py#_get_class_usage",
+                "type": "use"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "exp/parser.py#_get_object_name": {
+        "name": "exp/parser.py#_get_object_name",
+        "type": "func",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "exp/parser.py#_get_class_usage": {
+        "name": "exp/parser.py#_get_class_usage",
+        "type": "func",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "exp/parser.py#_get_function_usage": {
+        "name": "exp/parser.py#_get_function_usage",
+        "type": "func",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "exp/parser.py#_get_body_usage": {
+        "name": "exp/parser.py#_get_body_usage",
+        "type": "func",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "exp/ast_exp.py": {
+        "name": "exp/ast_exp.py",
+        "type": "file",
+        "edges": [
+            {
+                "id": "exp/ast_exp.py#ast_to_dict",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "exp/ast_exp.py#ast_to_dict": {
+        "name": "exp/ast_exp.py#ast_to_dict",
+        "type": "func",
+        "edges": [
+            {
+                "id": "exp/ast_exp.py#ast_to_dict",
+                "type": "use"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src": {
+        "name": "src",
+        "type": "directory",
+        "edges": [
+            {
+                "id": "interfaces",
+                "type": "contain"
+            },
+            {
+                "id": "core",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "interfaces": {
+        "name": "interfaces",
+        "type": "directory",
+        "edges": [
+            {
+                "id": "tkinter",
+                "type": "contain"
+            },
+            {
+                "id": "html",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "tkinter": {
+        "name": "tkinter",
+        "type": "directory",
+        "edges": [
+            {
+                "id": "src/interfaces/tkinter/interface.py",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/interfaces/tkinter/interface.py": {
+        "name": "src/interfaces/tkinter/interface.py",
+        "type": "file",
+        "edges": [
+            {
+                "id": "src/interfaces/tkinter/interface.py#ParserApp",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/interfaces/tkinter/interface.py#ParserApp": {
+        "name": "src/interfaces/tkinter/interface.py#ParserApp",
+        "type": "class",
+        "edges": [
+            {
+                "id": "src/core/parsing/git_handler.py#GitHandler",
+                "type": "use"
+            },
+            {
+                "id": "src/core/parsing/project_parser.py#ProjectParser",
+                "type": "use"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "html": {
+        "name": "html",
+        "type": "directory",
+        "edges": [
+            {
+                "id": "src/interfaces/html/html.py",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/interfaces/html/html.py": {
+        "name": "src/interfaces/html/html.py",
+        "type": "file",
+        "edges": [
+            {
+                "id": "src/interfaces/html/html.py#HtmlGraphBuilder",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/interfaces/html/html.py#HtmlGraphBuilder": {
+        "name": "src/interfaces/html/html.py#HtmlGraphBuilder",
+        "type": "class",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "core": {
+        "name": "core",
+        "type": "directory",
+        "edges": [
+            {
+                "id": "parsing",
+                "type": "contain"
+            },
+            {
+                "id": "graph",
+                "type": "contain"
+            },
+            {
+                "id": "models",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "parsing": {
+        "name": "parsing",
+        "type": "directory",
+        "edges": [
+            {
+                "id": "src/core/parsing/git_handler.py",
+                "type": "contain"
+            },
+            {
+                "id": "src/core/parsing/file_parser.py",
+                "type": "contain"
+            },
+            {
+                "id": "src/core/parsing/project_parser.py",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/parsing/git_handler.py": {
+        "name": "src/core/parsing/git_handler.py",
+        "type": "file",
+        "edges": [
+            {
+                "id": "src/core/parsing/git_handler.py#GitHandler",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/parsing/git_handler.py#GitHandler": {
+        "name": "src/core/parsing/git_handler.py#GitHandler",
+        "type": "class",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/parsing/file_parser.py": {
+        "name": "src/core/parsing/file_parser.py",
+        "type": "file",
+        "edges": [
+            {
+                "id": "src/core/parsing/file_parser.py#FileParser",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/parsing/file_parser.py#FileParser": {
+        "name": "src/core/parsing/file_parser.py#FileParser",
+        "type": "class",
+        "edges": [
+            {
+                "id": "src/core/models/node.py#Node",
+                "type": "use"
+            },
+            {
+                "id": "src/core/models/dependency.py#Import",
+                "type": "use"
+            },
+            {
+                "id": "src/core/models/dependency.py#Object",
+                "type": "use"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/parsing/project_parser.py": {
+        "name": "src/core/parsing/project_parser.py",
+        "type": "file",
+        "edges": [
+            {
+                "id": "src/core/parsing/project_parser.py#ProjectParser",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/parsing/project_parser.py#ProjectParser": {
+        "name": "src/core/parsing/project_parser.py#ProjectParser",
+        "type": "class",
+        "edges": [
+            {
+                "id": "src/core/models/node.py#Node",
+                "type": "use"
+            },
+            {
+                "id": "src/core/models/graph.py#Graph",
+                "type": "use"
+            },
+            {
+                "id": "src/core/parsing/file_parser.py#FileParser",
+                "type": "use"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "graph": {
+        "name": "graph",
+        "type": "directory",
+        "edges": [
+            {
+                "id": "src/core/graph/builder.py",
+                "type": "contain"
+            },
+            {
+                "id": "src/core/graph/extensions.py",
+                "type": "contain"
+            },
+            {
+                "id": "src/core/graph/filters.py",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/graph/builder.py": {
+        "name": "src/core/graph/builder.py",
+        "type": "file",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/graph/extensions.py": {
+        "name": "src/core/graph/extensions.py",
+        "type": "file",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/graph/filters.py": {
+        "name": "src/core/graph/filters.py",
+        "type": "file",
+        "edges": [
+            {
+                "id": "src/core/graph/filters.py#FilterMode",
+                "type": "contain"
+            },
+            {
+                "id": "src/core/graph/filters.py#Filter",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/graph/filters.py#FilterMode": {
+        "name": "src/core/graph/filters.py#FilterMode",
+        "type": "class",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/graph/filters.py#Filter": {
+        "name": "src/core/graph/filters.py#Filter",
+        "type": "class",
+        "edges": [
+            {
+                "id": "src/core/models/graph.py#Graph",
+                "type": "use"
+            },
+            {
+                "id": "src/core/models/edge.py#Edge",
+                "type": "use"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "models": {
+        "name": "models",
+        "type": "directory",
+        "edges": [
+            {
+                "id": "src/core/models/dependency.py",
+                "type": "contain"
+            },
+            {
+                "id": "src/core/models/edge.py",
+                "type": "contain"
+            },
+            {
+                "id": "src/core/models/node.py",
+                "type": "contain"
+            },
+            {
+                "id": "src/core/models/graph.py",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/models/dependency.py": {
+        "name": "src/core/models/dependency.py",
+        "type": "file",
+        "edges": [
+            {
+                "id": "src/core/models/dependency.py#Object",
+                "type": "contain"
+            },
+            {
+                "id": "src/core/models/dependency.py#Import",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/models/dependency.py#Object": {
+        "name": "src/core/models/dependency.py#Object",
+        "type": "class",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/models/dependency.py#Import": {
+        "name": "src/core/models/dependency.py#Import",
+        "type": "class",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/models/edge.py": {
+        "name": "src/core/models/edge.py",
+        "type": "file",
+        "edges": [
+            {
+                "id": "src/core/models/edge.py#TypeEdge",
+                "type": "contain"
+            },
+            {
+                "id": "src/core/models/edge.py#Edge",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/models/edge.py#TypeEdge": {
+        "name": "src/core/models/edge.py#TypeEdge",
+        "type": "class",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/models/edge.py#Edge": {
+        "name": "src/core/models/edge.py#Edge",
+        "type": "class",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/models/node.py": {
+        "name": "src/core/models/node.py",
+        "type": "file",
+        "edges": [
+            {
+                "id": "src/core/models/node.py#TypeNode",
+                "type": "contain"
+            },
+            {
+                "id": "src/core/models/node.py#MetaInfo",
+                "type": "contain"
+            },
+            {
+                "id": "src/core/models/node.py#Node",
+                "type": "contain"
+            },
+            {
+                "id": "src/core/models/node.py#FileMetaInfo",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/models/node.py#TypeNode": {
+        "name": "src/core/models/node.py#TypeNode",
+        "type": "class",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/models/node.py#MetaInfo": {
+        "name": "src/core/models/node.py#MetaInfo",
+        "type": "class",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/models/node.py#Node": {
+        "name": "src/core/models/node.py#Node",
+        "type": "class",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/models/node.py#FileMetaInfo": {
+        "name": "src/core/models/node.py#FileMetaInfo",
+        "type": "class",
+        "edges": [],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/models/graph.py": {
+        "name": "src/core/models/graph.py",
+        "type": "file",
+        "edges": [
+            {
+                "id": "src/core/models/graph.py#Graph",
+                "type": "contain"
+            }
+        ],
+        "meta": {
+            "labels": []
+        }
+    },
+    "src/core/models/graph.py#Graph": {
+        "name": "src/core/models/graph.py#Graph",
+        "type": "class",
+        "edges": [
+            {
+                "id": "src/core/models/edge.py#Edge",
+                "type": "use"
+            }
+        ],
         "meta": {
             "labels": []
         }

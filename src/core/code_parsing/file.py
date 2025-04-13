@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class FileParser:
-    def __init__(self, file_node_name: str, file_path: Path,project_path: Path, graph: Graph):
+    def __init__(self, file_node_name: str, file_path: Path, project_path: Path, graph: Graph):
         self.file_node_name = file_node_name
         self.file_path = file_path
         self.project_path = project_path
@@ -32,7 +32,7 @@ class FileParser:
         except Exception as e:
             logger.error(f"Error parsing {self.file_path}: {str(e)}")
             return {}
-            
+
         try:
             self._create_structure(tree)
             return self._analyze_dependencies(tree)
@@ -74,18 +74,18 @@ class FileParser:
         )
 
     def _process_class_node(self, node):
-        class_name = f"{self.file_node_name}#{node.name}"
+        class_name = f"{self.file_node_name}#{node.id}"
         class_node = Node(
-            name=class_name,
+            id=class_name,
             type=TypeNode.CLASS
         )
         if self.graph.add_node(class_node):
             self.graph.add_edge(self.file_node_name, class_name, TypeEdge.CONTAIN)
 
     def _process_function_node(self, node):
-        func_name = f"{self.file_node_name}#{node.name}"
+        func_name = f"{self.file_node_name}#{node.id}"
         func_node = Node(
-            name=func_name,
+            id=func_name,
             type=TypeNode.FUNC
         )
         if self.graph.add_node(func_node):

@@ -10,7 +10,6 @@ class Object:
 
 @dataclass
 class Import:
-    fullname: str  # название модуля, откуда происходит импорт
+    fullname: str
     alias: Optional[str]
-    objects: List[Object] = field(default_factory=list)  # объекты, которые импортируются(для import from)
-
+    objects: List[Object] = field(default_factory=list)

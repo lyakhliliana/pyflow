@@ -20,12 +20,7 @@ class MetaInfo:
 
 @dataclass
 class Node:
-    name: str
+    id: str
     type: str
     edges: List[Edge] = field(default_factory=list)
     meta: MetaInfo = field(default_factory=MetaInfo)
-
-
-@dataclass
-class FileMetaInfo(MetaInfo):
-    imports: List[str] = field(default_factory=list)

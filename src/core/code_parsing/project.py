@@ -1,17 +1,17 @@
 from collections import defaultdict
 import logging
 from pathlib import Path
-from typing import Dict, List, Set
+from typing import List
 import os
 
-from src.core.parsing.file_parser import FileParser
+from src.core.code_parsing.file import FileParser
 from src.core.models.edge import TypeEdge
 from src.core.models.node import Node, TypeNode
 from src.core.models.graph import Graph
 
 logger = logging.getLogger(__name__)
 
-ROOT_NODE_NAME = "."
+ROOT_NODE_NAME = "root"
 
 
 class ProjectParser:
@@ -25,14 +25,14 @@ class ProjectParser:
         self._build_project_structure()
         self._analyze_usages()
         return self.graph
-    
+
     def save_graph(self, path):
         self.graph.save(path)
 
     def _build_project_structure(self):
         py_files = self._find_python_files()
 
-        root_node = Node(name=ROOT_NODE_NAME, type=TypeNode.DIRECTORY)
+        root_node = Node(id=ROOT_NODE_NAME, type=TypeNode.DIRECTORY)
         self.graph.add_node(root_node)
 
         for file_path in py_files:
@@ -61,24 +61,24 @@ class ProjectParser:
 
             if str_current_path not in self.graph:
                 dir_node = Node(
-                    name=str_current_path,
+                    id=str_current_path,
                     type=TypeNode.DIRECTORY
                 )
 
                 self.graph.add_node(dir_node)
-                self.graph.add_edge(parent_node_name, dir_node.name, TypeEdge.CONTAIN)
+                self.graph.add_edge(parent_node_name, dir_node.id, TypeEdge.CONTAIN)
 
-                parent_node_name = dir_node.name
+                parent_node_name = dir_node.id
             else:
                 parent_node_name = str_current_path
 
         file_node = Node(
-            name=rel_path.as_posix(),
+            id=rel_path.as_posix(),
             type=TypeNode.FILE
         )
 
         if self.graph.add_node(file_node):
-            self.graph.add_edge(parent_node_name, file_node.name, TypeEdge.CONTAIN)
+            self.graph.add_edge(parent_node_name, file_node.id, TypeEdge.CONTAIN)
 
         usages = self._parse_file(path)
         for key, value in usages.items():
@@ -91,11 +91,11 @@ class ProjectParser:
         rel_path = file_path.relative_to(self.project_path)
         file_node_name = str(rel_path)
 
-        visitor = FileParser(file_node_name, file_path, self.project_path,  self.graph)
+        visitor = FileParser(file_node_name, file_path, self.project_path, self.graph)
         return visitor.parse()
 
     def _analyze_usages(self):
         for source, usages in self.usages.items():
             for target in usages:
                 if source in self.graph and target in self.graph:
-                    self.graph.add_edge(source,target, TypeEdge.USE)
+                    self.graph.add_edge(source, target, TypeEdge.USE)

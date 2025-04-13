@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
-from src.core.parsing.git_handler import GitHandler
-from src.core.parsing.project_parser import ProjectParser
+from core.utils.git_handler import GitHandler
+from src.core.code_parsing.project import ProjectParser
 from interfaces.html.html import HtmlGraphBuilder
 
 
