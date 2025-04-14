@@ -23,7 +23,7 @@ class Graph:
     def add_node(self, node: Node) -> bool:
         if node.id in self.nodes:
             return False
-        
+
         for edge in node.edges:
             self.inv_edges[edge.id].add(node.id)
 

@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import csv
 from typing import Dict
 from pathlib import Path
@@ -9,10 +10,18 @@ from src.core.models.graph import Graph
 logger = logging.getLogger(__name__)
 
 
-class GraphExporter:
+class IGraphExporter(ABC):
 
     @staticmethod
-    def save_to_csv(graph: Graph, nodes_path: str, edges_path: str) -> None:
+    @abstractmethod
+    def save(graph: Graph, nodes_path: str, edges_path: str) -> None:
+        pass
+
+
+class CSVGraphExporter(IGraphExporter):
+
+    @staticmethod
+    def save(graph: Graph, nodes_path: str, edges_path: str) -> None:
         """
         Сохраняет граф в два CSV-файла: узлы и связи.
 
@@ -21,8 +30,8 @@ class GraphExporter:
             nodes_path: Путь для файла узлов (формат: id,type,labels)
             edges_path: Путь для файла связей (формат: source_id,target_id,type)
         """
-        GraphExporter._save_nodes(graph.nodes, nodes_path)
-        GraphExporter._save_edges(graph.nodes, edges_path)
+        CSVGraphExporter._save_nodes(graph.nodes, nodes_path)
+        CSVGraphExporter._save_edges(graph.nodes, edges_path)
 
     @staticmethod
     def _save_nodes(nodes: Dict[str, Node], file_path: str) -> None:

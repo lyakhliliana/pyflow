@@ -34,7 +34,7 @@ class ValidationError(Exception):
     pass
 
 
-class GraphDataCSV(IGraphData):
+class CSVGraphData(IGraphData):
 
     @staticmethod
     def build(nodes_file: str, edges_file: str) -> Graph:
