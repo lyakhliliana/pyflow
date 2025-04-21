@@ -1,11 +1,11 @@
-from collections import defaultdict, deque
+from collections import deque
 from copy import deepcopy
 import logging
-from typing import Dict, Set, Tuple
+from typing import Set
 
 from core.models.edge import TypeEdge
-from src.core.models.node import MetaInfo, Node
-from src.core.models.graph import Graph
+from core.models.node import Node
+from core.models.graph import Graph
 
 logger = logging.getLogger(__name__)
 
@@ -35,12 +35,7 @@ class GraphExtensions:
         queue = deque([start_node])
 
         start_node_data = graph.nodes[start_node]
-        new_graph.add_node(Node(
-            id=start_node_data.id,
-            type=start_node_data.type,
-            edges=[],
-            meta=start_node_data.meta
-        ))
+        new_graph.add_node(Node(id=start_node_data.id, type=start_node_data.type, edges=[], meta=start_node_data.meta))
         visited.add(start_node)
 
         while queue:
@@ -56,12 +51,7 @@ class GraphExtensions:
 
                 if target_id not in visited:
                     target_node = graph.nodes[target_id]
-                    new_graph.add_node(Node(
-                        id=target_node.id,
-                        type=target_node.type,
-                        edges=[],
-                        meta=target_node.meta
-                    ))
+                    new_graph.add_node(Node(id=target_node.id, type=target_node.type, edges=[], meta=target_node.meta))
                     visited.add(target_id)
                     queue.append(target_id)
 
@@ -106,12 +96,8 @@ class GraphExtensions:
         for node_id in visited:
             original_node = graph.nodes[node_id]
 
-            new_graph.add_node(Node(
-                id=original_node.id,
-                type=original_node.type,
-                edges=[],
-                meta=deepcopy(original_node.meta)
-            ))
+            new_graph.add_node(
+                Node(id=original_node.id, type=original_node.type, edges=[], meta=deepcopy(original_node.meta)))
 
         for node_id in visited:
             original_node = graph.nodes[node_id]
@@ -122,47 +108,43 @@ class GraphExtensions:
 
         return new_graph
 
-    @staticmethod
-    def get_elements(graph: Graph) -> Graph:
-        """
-        Создает граф лейблов, где:
-        - Узлы: лейблы из исходного графа
-        - Ребра: USE-связи между лейблами
-        - Элементы: все узлы, помеченные лейблом или содержащиеся через CONTAIN
+    # @staticmethod
+    # def get_elements(graph: Graph) -> Graph:
+    #     """
+    #     Создает граф лейблов, где:
+    #     - Узлы: лейблы из исходного графа
+    #     - Ребра: USE-связи между лейблами
+    #     - Элементы: все узлы, помеченные лейблом или содержащиеся через CONTAIN
 
-        Returns:
-            Graph: Новый граф с лейблами как узлами
-        """
-        new_graph = Graph()
-        label_map: Dict[str, Set[str]] = defaultdict(set)
+    #     Returns:
+    #         Graph: Новый граф с лейблами как узлами
+    #     """
+    #     new_graph = Graph()
+    #     label_map: Dict[str, Set[str]] = defaultdict(set)
 
-        for node in graph.nodes.values():
-            for label in node.meta.labels:
-                contained = GraphExtensions._get_contained_elements(graph, node.id)
-                label_map[label].update(contained)
+    #     for node in graph.nodes.values():
+    #         for label in node.meta.labels:
+    #             contained = GraphExtensions._get_contained_elements(graph, node.id)
+    #             label_map[label].update(contained)
 
-        for label, elements in label_map.items():
-            new_node = Node(
-                id=label,
-                type="Label",
-                meta=MetaInfo(labels=list(elements))
-            )
-            new_graph.add_node(new_node)
+    #     for label, elements in label_map.items():
+    #         new_node = Node(id=label, type="Label"))
+    #         new_graph.add_node(new_node)
 
-        edges_added: Set[Tuple[str, str]] = set()
-        for node in graph.nodes.values():
-            for edge in node.edges:
-                if edge.type == TypeEdge.USE and edge.id in graph.nodes:
-                    target_node = graph.nodes[edge.id]
-                    source_labels = set(node.meta.labels)
-                    target_labels = set(target_node.meta.labels)
+    #     edges_added: Set[Tuple[str, str]] = set()
+    #     for node in graph.nodes.values():
+    #         for edge in node.edges:
+    #             if edge.type == TypeEdge.USE and edge.id in graph.nodes:
+    #                 target_node = graph.nodes[edge.id]
+    #                 source_labels = set(node.meta.labels)
+    #                 target_labels = set(target_node.meta.labels)
 
-                    for src_label in source_labels:
-                        for tgt_label in target_labels:
-                            if src_label != tgt_label and (src_label, tgt_label) not in edges_added:
-                                new_graph.add_edge(src_label, tgt_label, TypeEdge.USE)
-                                edges_added.add((src_label, tgt_label))
-        return new_graph
+    #                 for src_label in source_labels:
+    #                     for tgt_label in target_labels:
+    #                         if src_label != tgt_label and (src_label, tgt_label) not in edges_added:
+    #                             new_graph.add_edge(src_label, tgt_label, TypeEdge.USE)
+    #                             edges_added.add((src_label, tgt_label))
+    #     return new_graph
 
     @staticmethod
     def _get_contained_elements(graph: Graph, start_id: str) -> Set[str]:

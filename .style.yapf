@@ -1,0 +1,10 @@
+[style]
+indent_width=4
+use_tabs=False
+continuation_indent_width=4
+
+column_limit=120
+
+blank_lines_around_top_level_definition=2
+blank_line_before_nested_class_or_def=True
+blank_lines_between_top_level_imports_and_variables=1

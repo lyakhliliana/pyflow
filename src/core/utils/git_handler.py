@@ -2,23 +2,27 @@ import os
 import logging
 from git import Repo, GitCommandError
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Optional
 
 logger = logging.getLogger(__name__)
 
-TMP_REPO_DIR = "./tmp/repos"
-
 
 class GitHandler:
-    __slots__ = ('cache_dir')
+    __slots__ = ('_repos')
 
-    def __init__(self, cache_dir: str = TMP_REPO_DIR):
-        self.cache_dir = Path(cache_dir)
-        self.cache_dir.mkdir(parents=True, exist_ok=True)
+    def __init__(self):
+        self._repos: Dict[str, Path] = dict()
 
-    def clone_repo(self, repo_url: str, force_clone: bool = False) -> Optional[Path]:
-        repo_name = self._extract_repo_name(repo_url)
-        repo_path = self.cache_dir / repo_name
+    @staticmethod
+    def clone_repo(repo_url: str, destination: str = "", force_clone: bool = True) -> Optional[Path]:
+        if destination == "":
+            destination = os.getcwd()
+
+        dest_path = Path(destination)
+        dest_path.mkdir(parents=True, exist_ok=True)
+
+        repo_name = GitHandler.extract_repo_name(repo_url)
+        repo_path = dest_path / repo_name
 
         if repo_path.exists() and not force_clone:
             logger.info(f"Using cached repository at {repo_path}")
@@ -32,13 +36,19 @@ class GitHandler:
             logger.error(f"Failed to clone repository: {str(e)}")
             return None
 
-    def _extract_repo_name(self, repo_url: str) -> str:
+    @staticmethod
+    def extract_repo_name(repo_url: str) -> str:
         if repo_url.endswith(".git"):
             repo_url = repo_url[:-4]
         return repo_url.split("/")[-1]
 
-    def cleanup(self):
-        for item in self.cache_dir.iterdir():
-            if item.is_dir():
-                logger.info(f"Removing {item}")
-                os.system(f"rm -rf {item}")
+    @staticmethod
+    def clean_repo(repo: str):
+        repo_path = Path(repo)
+        if not repo_path.exists():
+            logger.info(f"{repo} does not exist.")
+            return
+
+        if repo_path.is_dir():
+            logger.info(f"Removing {repo}")
+            os.system(f"rm -rf {repo}")

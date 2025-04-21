@@ -1,6 +1,6 @@
-from src.core.models.graph import Graph
-from src.core.models.edge import Edge, TypeEdge
-from src.core.models.node import TypeNode
+from core.models.graph import Graph
+from core.models.edge import Edge, TypeEdge
+from core.models.node import TypeNode
 
 
 class FilterMode:
@@ -22,8 +22,8 @@ class Filter:
 
         for _, node in filtered_graph.nodes.items():
             filtered_links = [
-                link for link in node.edges if link.type in [
-                    TypeEdge.USE] and link.id in filtered_graph.nodes]
+                link for link in node.edges if link.type in [TypeEdge.USE] and link.id in filtered_graph.nodes
+            ]
             node.edges = filtered_links
 
         return filtered_graph

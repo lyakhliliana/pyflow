@@ -1,1 +1,3 @@
 gitpython==3.1.43
+pyvis==0.3.2
+yapf==0.43.0

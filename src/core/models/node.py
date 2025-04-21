@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List
 
-from src.core.models.edge import Edge
+from core.models.edge import Edge
 
 
 class TypeNode:
@@ -12,17 +12,17 @@ class TypeNode:
     FUNC = 'func'
     BODY = 'body'
 
-    model = 'model'
+    ARC_ELEMENT = 'arc_elem'
 
 
-@dataclass
-class MetaInfo:
-    labels: List[str] = field(default_factory=list)
+class TypeSourceNode(str):
+    CODE = 'code'
+    HAND = 'hand'
 
 
 @dataclass
 class Node:
     id: str
-    type: str
+    type: TypeNode
+    source_type: TypeSourceNode
     edges: List[Edge] = field(default_factory=list)
-    meta: MetaInfo = field(default_factory=MetaInfo)
