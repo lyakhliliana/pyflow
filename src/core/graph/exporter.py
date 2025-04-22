@@ -29,8 +29,8 @@ class CSVGraphExporter(IGraphExporter):
             graph: Экземпляр графа для экспорта
             directory_path: Путь к директории для сохранения файлов
                 (создастся при отсутствии). Файлы будут:
-                - nodes.csv: id,type,labels
-                - edges.csv: source_id,target_id,type
+                - nodes.csv: [id,type,source_type]
+                - edges.csv: [source_id,target_id,type,source_type]
         """
         Path(directory_path).mkdir(parents=True, exist_ok=True)
         nodes_path = os.path.join(directory_path, "nodes.csv")

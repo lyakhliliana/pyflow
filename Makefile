@@ -10,5 +10,7 @@ uninstall_cache:
 
 extract:
 	python3 -B -m interfaces.cli.cli extract ./src -o tmp/results/version1
+union:
+	python3 -B -m interfaces.cli.cli union tmp/results/version1 code
 visualize:
-	python3 -B -m interfaces.cli.cli visualize tmp/results/version1
+	python3 -B -m interfaces.cli.cli visualize tmp/results/version1/union

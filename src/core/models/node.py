@@ -4,7 +4,7 @@ from typing import List
 from core.models.edge import Edge
 
 
-class TypeNode:
+class TypeNode(str):
     DIRECTORY = 'directory'
     FILE = 'file'
 
