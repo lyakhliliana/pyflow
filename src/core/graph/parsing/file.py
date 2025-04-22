@@ -198,7 +198,9 @@ class FileCodeParser(IFileCodeParser):
             logger.error(f"Error resolving {import_name}: {str(e)}")
             return None
 
+
 class UsageVisitor(ast.NodeVisitor):
+
     def __init__(self, ignore_self: bool = False):
         self.used: Set[str] = set()
         self.ignore_self = ignore_self
@@ -258,7 +260,9 @@ class UsageVisitor(ast.NodeVisitor):
             self.visit(base)
         self.generic_visit(node)
 
+
 class UsagesCollector:
+
     @staticmethod
     def get_class_usages(class_node: ast.ClassDef) -> Set[str]:
         visitor = UsageVisitor(ignore_self=True)

@@ -1,5 +1,5 @@
 import argparse
-from interfaces.cli.handlers import handle_extract, handle_union, handle_visualise
+from interfaces.cli.handlers import handle_diff, handle_extract, handle_union, handle_visualise
 
 
 def main():
@@ -13,20 +13,26 @@ def main():
                                 "--output-dir",
                                 default=None,
                                 help="Output directory (default: current directory)")
-    
+
     # Парсер для команды union
     union_parser = subparsers.add_parser("union", help="Union graph and additional elements")
     union_parser.add_argument("source", help="Path to source directory with project graphs")
     union_parser.add_argument("graph", help="Graph name from a directory with project graphs")
 
     # Парсер для команды visualize
-    visualise_parser = subparsers.add_parser("visualize", help="Мisualize saved dependency graph")
+    visualise_parser = subparsers.add_parser("visualize", help="Visualize saved dependency graph")
     visualise_parser.add_argument("source", help="Path to saved graph file (.json/.graphml)")
     visualise_parser.add_argument("-m",
                                   "--mode",
                                   choices=["basic", "union"],
                                   default="basic",
                                   help="Visualization mode(basic, union)")
+
+    # Парсер для команды diff
+    diff_parser = subparsers.add_parser("diff", help="Visualize difference from graphs")
+    diff_parser.add_argument("source", help="Path to source directory with project graphs")
+    diff_parser.add_argument("first", help="Graph name from a directory with project graphs")
+    diff_parser.add_argument("second", help="Graph name from a directory with project graphs")
 
     args = parser.parse_args()
 
@@ -37,6 +43,8 @@ def main():
             handle_visualise(args)
         if args.command == "union":
             handle_union(args)
+        if args.command == "diff":
+            handle_diff(args)
     except Exception as e:
         print(f"Error: {str(e)}")
         exit(1)

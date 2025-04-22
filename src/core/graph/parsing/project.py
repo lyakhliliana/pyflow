@@ -13,7 +13,7 @@ from core.models.graph import Graph
 logger = logging.getLogger(__name__)
 
 ROOT_NODE_NAME = "root"
-IGNORED_DIRS =  ["venv", "tmp"]
+IGNORED_DIRS = ["venv", "tmp"]
 
 
 class IProjectCodeParser(ABC):
@@ -79,7 +79,10 @@ class ProjectCodeParser(IProjectCodeParser):
                 if str_current_path not in self._graph:
                     dir_node = Node(id=str_current_path, type=TypeNode.DIRECTORY, source_type=TypeSourceNode.CODE)
                     self._graph.add_node(dir_node)
-                    self._graph.add_edge(parent_node_name, dir_node.id, TypeEdge.CONTAIN, source_type=TypeSourceEdge.CODE)
+                    self._graph.add_edge(parent_node_name,
+                                         dir_node.id,
+                                         TypeEdge.CONTAIN,
+                                         source_type=TypeSourceEdge.CODE)
 
                     parent_node_name = dir_node.id
                 else:

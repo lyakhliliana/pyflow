@@ -2,6 +2,8 @@ from argparse import Namespace
 import logging
 import os
 from pathlib import Path
+from core.graph.difference import GraphComparator
+from core.models.graph import Graph
 from core.utils.validatie import is_git_url
 from core.graph.parsing.project import ProjectCodeParser
 from core.graph.builder import ADDITIONAL_SECTION_NAME, CODE_SECTION_NAME, UNION_SECTION_NAME, CSVGraphBuilder
@@ -12,6 +14,7 @@ from src.core.graph.visualise import HtmlGraphVisualizer
 logger = logging.getLogger(__name__)
 
 VIS_NAME = "graph.html"
+DIFF_NAME = "diff.html"
 
 
 def handle_extract(args: Namespace):
@@ -50,7 +53,7 @@ def handle_extract(args: Namespace):
     except Exception as e:
         print(f"error saving project graph {args.source}: {str(e)}")
         return
-    
+
     try:
         CSVGraphBuilder.init_additional_files(args.output_dir)
     except Exception as e:
@@ -64,10 +67,20 @@ def handle_visualise(args: Namespace):
         print(f"source path is not exist: {args.source}")
         return
 
+    graph: Graph
     if args.mode == "basic":
-        graph = CSVGraphBuilder.build(source_path)
+        try:
+            graph = CSVGraphBuilder.build(source_path)
+        except Exception as e:
+            print(f"error extract graph {source_path}: {str(e)}")
+            return
         vis_path = os.path.join(source_path, VIS_NAME)
-        HtmlGraphVisualizer.create(graph, vis_path)
+
+        try:
+            HtmlGraphVisualizer.create(graph, vis_path)
+        except Exception as e:
+            print(f"error visualize graph {source_path}: {str(e)}")
+            return
 
 
 def handle_union(args: Namespace):
@@ -83,11 +96,46 @@ def handle_union(args: Namespace):
     except Exception as e:
         print(f"error build union graph: {str(e)}")
         return
-    
+
     union_dir = os.path.join(args.source, UNION_SECTION_NAME)
     try:
         CSVGraphExporter.save(graph, union_dir)
     except Exception as e:
         print(f"error saving union graph {union_dir}: {str(e)}")
         return
-    
+
+
+def handle_diff(args: Namespace):
+    source_path = Path(args.source)
+    if not source_path.exists():
+        print(f"source path is not exist: {args.source}")
+        return
+
+    first_graph: Graph
+    second_graph: Graph
+    try:
+        graph_path = os.path.join(source_path, args.first)
+        first_graph = CSVGraphBuilder.build(graph_path)
+    except Exception as e:
+        print(f"error extract first graph {graph_path}: {str(e)}")
+        return
+
+    try:
+        graph_path = os.path.join(source_path, args.second)
+        second_graph = CSVGraphBuilder.build(graph_path)
+    except Exception as e:
+        print(f"error extract first graph {graph_path}: {str(e)}")
+        return
+
+    try:
+        difference = GraphComparator.get_difference(first_graph, second_graph)
+    except Exception as e:
+        print(f"error get difference between {args.first} and {args.second}: {str(e)}")
+        return
+
+    try:
+        vis_path = os.path.join(source_path, DIFF_NAME)
+        HtmlGraphVisualizer.create_difference(first_graph, second_graph, difference, vis_path)
+    except Exception as e:
+        print(f"error visualize difference graph between {args.first} and {args.second}: {str(e)}")
+        return

@@ -1,10 +1,8 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-import copy
 import csv
 import logging
 import os
-from typing import Dict, List, Tuple
 
 from core.models.edge import TypeEdge, TypeSourceEdge
 from core.models.node import Node, TypeSourceNode
@@ -124,14 +122,13 @@ class CSVGraphBuilder(IGraphBuilder):
             with open(edges_path, "w", newline="", encoding="utf-8") as edges_file:
                 edges_file.write("source_id,target_id,type\n")
 
-
     @staticmethod
     def _process_nodes(file_path: str, graph: Graph, additional: bool = False) -> None:
         with open(file_path, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row_num, row in enumerate(reader, 1):
                 try:
-                    node =  Node(id=row['id'].strip(), type=row['type'].strip(), source_type="")
+                    node = Node(id=row['id'].strip(), type=row['type'].strip(), source_type="")
                     node.source_type = TypeSourceNode.HAND if additional else row['source_type'].strip()
 
                     if node.id in graph:
@@ -150,7 +147,8 @@ class CSVGraphBuilder(IGraphBuilder):
             reader = csv.DictReader(f)
             for row_num, row in enumerate(reader, 1):
                 try:
-                    source_id, target_id, edge_type = row['source_id'].strip(), row['target_id'].strip(), row['type'].strip()
+                    source_id, target_id, edge_type = row['source_id'].strip(), row['target_id'].strip(
+                    ), row['type'].strip()
                     source_type = TypeSourceEdge.HAND if additional else row['source_type'].strip()
 
                     if source_id in graph and target_id in graph:

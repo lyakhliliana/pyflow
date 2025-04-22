@@ -62,13 +62,20 @@ class CSVGraphExporter(IGraphExporter):
             Path(file_path).parent.mkdir(parents=True, exist_ok=True)
 
             with open(file_path, 'w', newline='', encoding='utf-8') as f:
-                writer = csv.DictWriter(f, fieldnames=['source_id', 'target_id', 'type', 'source_type'], quoting=csv.QUOTE_MINIMAL)
+                writer = csv.DictWriter(f,
+                                        fieldnames=['source_id', 'target_id', 'type', 'source_type'],
+                                        quoting=csv.QUOTE_MINIMAL)
                 writer.writeheader()
 
                 edge_count = 0
                 for node in graph.nodes.values():
                     for edge in node.edges:
-                        writer.writerow({'source_id': node.id, 'target_id': edge.id, 'type': edge.type, 'source_type': edge.source_type})
+                        writer.writerow({
+                            'source_id': node.id,
+                            'target_id': edge.id,
+                            'type': edge.type,
+                            'source_type': edge.source_type
+                        })
                         edge_count += 1
 
             logger.info(f"Успешно сохранено {edge_count} связей в {file_path}")
