@@ -36,18 +36,18 @@ def main():
 
     args = parser.parse_args()
 
-    try:
-        if args.command == "extract":
-            handle_extract(args)
-        if args.command == "visualize":
-            handle_visualise(args)
-        if args.command == "union":
-            handle_union(args)
-        if args.command == "diff":
-            handle_diff(args)
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        exit(1)
+    # try:
+    if args.command == "extract":
+        handle_extract(args)
+    if args.command == "visualize":
+        handle_visualise(args)
+    if args.command == "union":
+        handle_union(args)
+    if args.command == "diff":
+        handle_diff(args)
+    # except Exception as e:
+    #     print(f"Error: {str(e)}")
+    #     exit(1)
 
 
 if __name__ == "__main__":

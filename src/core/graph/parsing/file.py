@@ -1,15 +1,17 @@
 from abc import ABC, abstractmethod
 import ast
-from collections import defaultdict
+import hashlib
 import keyword
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import List, Optional, Set
 
-from core.models.dependency import Import, Object
-from core.models.edge import TypeEdge, TypeSourceEdge
+from core.models.dependency import Import, ImportObject
+from core.models.edge import Edge, TypeEdge, TypeSourceEdge
 from core.models.node import Node, TypeNode, TypeSourceNode
 from core.models.graph import Graph
+
+NAME_BODY_NODE = "body"
 
 logger = logging.getLogger(__name__)
 
@@ -17,81 +19,112 @@ logger = logging.getLogger(__name__)
 class IFileCodeParser(ABC):
 
     @abstractmethod
-    def __init__(self, file_path: Path, graph: Graph, project_path: Path):
+    def __init__(self, file_path: Path | str, project_path: Path | str):
         pass
 
     @abstractmethod
-    def parse(self):
+    def parse(self) -> Graph:
         pass
 
 
 class FileCodeParser(IFileCodeParser):
 
-    def __init__(self, file_path: Path, graph: Graph, project_path: Path):
-        self.file_path: Path = file_path
-        self.project_path: Path = project_path
-        self.parent_node_id: str = str(file_path.relative_to(project_path))
-        self.graph: Graph = graph
+    def __init__(self, file_path: Path | str, project_path: Path | str):
+        self.file_path = Path(file_path).resolve()
+        self.project_path = Path(project_path).resolve()
+        self.rel_path_to_project_root = str(self.file_path.relative_to(self.project_path))
 
-        self._has_body = False
         self._imports: List[Import] = []
-        self._usages: Dict[str, Set[str]] = defaultdict(set)
+        self._graph = Graph()
+        self._tree = None
 
     def parse(self):
-        tree = None
+        self._imports: List[Import] = []
+        self._graph = Graph()
+
         try:
             with open(self.file_path, "r", encoding="utf-8") as f:
-                tree = ast.parse(f.read())
+                self._tree = ast.parse(f.read())
         except Exception as e:
-            logger.error(f"Error parsing {self.file_path}: {str(e)}")
-            raise e
+            error_text = f"Ошибка при отркытии файла {self.file_path}: {str(e)}"
+            raise Exception(error_text)
 
         try:
-            self._create_structure(tree)
-            self._form_usages(tree)
+            self._find_nodes()
+            self._find_edges()
 
         except Exception as e:
-            logger.error(f"Error parsing {self.file_path}: {str(e)}")
-            raise e
+            error_text = f"Ошибка при анализе файла {self.file_path}: {str(e)}"
+            raise Exception(error_text)
 
-    def get_usages(self) -> Dict[str, Set]:
-        return self._usages
+        return self._graph
 
-    def _create_structure(self, tree):
-        for node in tree.body:
+    def _find_nodes(self):
+        body_nodes = []
+
+        for node in self._tree.body:
             if isinstance(node, ast.Import):
                 self._process_import(node)
             elif isinstance(node, ast.ImportFrom):
                 self._process_import_from(node)
             elif isinstance(node, ast.ClassDef):
-                self._process_class_node(node)
+                self._add_class_node(node)
             elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                self._process_function_node(node)
+                self._add_function_node(node)
             else:
-                self._has_body = True
+                body_nodes.append(node)
 
-    def _process_import(self, node):
+        self._add_body_node(body_nodes)
+
+    def _process_import(self, node: ast.Import):
         for alias in node.names:
             self._imports.append(Import(fullname=alias.name, alias=alias.asname))
 
-    def _process_import_from(self, node):
-        import_objects = [Object(alias.name, alias.asname) for alias in node.names]
+    def _process_import_from(self, node: ast.ImportFrom):
+        import_objects = [ImportObject(alias.name, alias.asname) for alias in node.names]
         self._imports.append(Import(fullname=node.module, alias=None, objects=import_objects))
 
-    def _process_class_node(self, node):
-        class_node_id = f"{self.parent_node_id}#{node.name}"
-        class_node = Node(id=class_node_id, type=TypeNode.CLASS, source_type=TypeSourceNode.CODE)
-        if self.graph.add_node(class_node):
-            self.graph.add_edge(self.parent_node_id, class_node_id, TypeEdge.CONTAIN, source_type=TypeSourceEdge.CODE)
+    def _add_class_node(self, node: ast.ClassDef):
+        class_hash = self._calculate_node_hash(node)
+        class_id = f"{self.rel_path_to_project_root}#{node.name}"
+        class_node = Node(id=class_id, name=node.name, type=TypeNode.CLASS, hash=class_hash, source=TypeSourceNode.CODE)
+        self._graph.add_node(class_node)
 
-    def _process_function_node(self, node):
-        func_node_id = f"{self.parent_node_id}#{node.name}"
-        func_node = Node(id=func_node_id, type=TypeNode.FUNC, source_type=TypeSourceNode.CODE)
-        if self.graph.add_node(func_node):
-            self.graph.add_edge(self.parent_node_id, func_node_id, TypeEdge.CONTAIN, source_type=TypeSourceEdge.CODE)
+    def _add_function_node(self, node: ast.FunctionDef | ast.AsyncFunctionDef):
+        func_hash = self._calculate_node_hash(node)
+        func_id = f"{self.rel_path_to_project_root}#{node.name}"
+        func_node = Node(id=func_id, name=node.name, type=TypeNode.FUNC, hash=func_hash, source=TypeSourceNode.CODE)
+        self._graph.add_node(func_node)
 
-    def _form_usages(self, tree):
-        for ast_node in tree.body:
+    def _add_body_node(self, body_nodes: List[ast.AST]):
+        if len(body_nodes) == 0:
+            return
+
+        body_hash = self._calculate_nodes_hash(body_nodes)
+        body_id = f"{self.rel_path_to_project_root}#{NAME_BODY_NODE}"
+        body_node = Node(id=body_id,
+                         name=NAME_BODY_NODE,
+                         type=TypeNode.BODY,
+                         hash=body_hash,
+                         source=TypeSourceNode.CODE)
+        self._graph.add_node(body_node)
+
+    def _calculate_node_hash(self, node: ast.AST) -> str:
+        dumped = ast.dump(node, annotate_fields=True, include_attributes=False)
+        data = dumped.encode('utf-8')
+        return hashlib.sha256(data).hexdigest()[0:8]
+
+    def _calculate_nodes_hash(self, nodes: List[ast.AST]) -> str:
+        hasher = hashlib.sha256()
+        for node in nodes:
+            dumped = ast.dump(node, annotate_fields=True, include_attributes=False)
+            segment = (dumped + '\n').encode('utf-8')
+            hasher.update(segment)
+        return hasher.hexdigest()[0:8]
+
+    def _find_edges(self):
+
+        for ast_node in self._tree.body:
             current_entity: str
             used: Set[str]
 
@@ -99,24 +132,20 @@ class FileCodeParser(IFileCodeParser):
                 continue
 
             elif isinstance(ast_node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                current_entity = f"{self.parent_node_id}#{ast_node.name}"
+                current_entity = f"{self.rel_path_to_project_root}#{ast_node.name}"
                 used = UsagesCollector.get_function_usages(ast_node)
 
             elif isinstance(ast_node, (ast.ClassDef)):
-                current_entity = f"{self.parent_node_id}#{ast_node.name}"
+                current_entity = f"{self.rel_path_to_project_root}#{ast_node.name}"
                 used = UsagesCollector.get_class_usages(ast_node)
 
-            elif self._has_body:
-                current_entity = f"{self.parent_node_id}#body"
+            else:
+                current_entity = f"{self.rel_path_to_project_root}#{NAME_BODY_NODE}"
                 used = UsagesCollector.get_body_usages(ast_node)
 
-            else:
-                continue
+            self._form_edges(used, current_entity)
 
-            self._process_usages(used, current_entity)
-
-    def _process_usages(self, used: Set[str], current_entity: str):
-        usage_info = self._usages[current_entity]
+    def _form_edges(self, used: Set[str], current_entity: str):
 
         for name in used:
             if name in __builtins__ or keyword.iskeyword(name):
@@ -125,9 +154,12 @@ class FileCodeParser(IFileCodeParser):
             parts = list(name.split('.'))
             base_name = parts[0]
 
-            local_candidate = f"{self.parent_node_id}#{base_name}"
-            if local_candidate in self.graph.nodes:
-                usage_info.add(local_candidate)
+            local_candidate = f"{self.rel_path_to_project_root}#{base_name}"
+            if local_candidate in self._graph.nodes:
+                use_edge = Edge(src=current_entity, dest=local_candidate, type=TypeEdge.USE, source=TypeSourceEdge.CODE)
+                added = self._graph.add_edge(use_edge)
+                if not added:
+                    logger.warning(f"failed add edge from {current_entity} to {local_candidate}")
                 continue
 
             # Поиск в импортах
@@ -153,7 +185,10 @@ class FileCodeParser(IFileCodeParser):
                             break
 
                 if target:
-                    usage_info.add(target)
+                    use_edge = Edge(src=current_entity, dest=target, type=TypeEdge.USE, source=TypeSourceEdge.CODE)
+                    added = self._graph.add_edge(use_edge, with_check=False)
+                    if not added:
+                        logger.warning(f"failed add edge from {current_entity} to {target}")
                     break
 
     def _resolve_module_path(self, import_name: str, current_file_path: Optional[Path] = None) -> Optional[str]:

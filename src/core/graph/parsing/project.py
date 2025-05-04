@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-from ast import Set
+import hashlib
 import logging
 from pathlib import Path
-from typing import Dict, List
+from typing import List, Set
 import os
 
-from core.graph.parsing.file import FileCodeParser
-from core.models.edge import TypeEdge, TypeSourceEdge
+from src.core.graph.parsing.file import FileCodeParser
+from core.models.edge import Edge, TypeEdge, TypeSourceEdge
 from core.models.node import Node, TypeNode, TypeSourceNode
 from core.models.graph import Graph
 
@@ -16,7 +16,7 @@ ROOT_NODE_NAME = "root"
 IGNORED_DIRS = ["venv", "tmp"]
 
 
-class IProjectCodeParser(ABC):
+class IProjectParser(ABC):
 
     @abstractmethod
     def __init__(self, project_path: str | Path, ignored_directories: List = IGNORED_DIRS):
@@ -27,27 +27,34 @@ class IProjectCodeParser(ABC):
         pass
 
 
-class ProjectCodeParser(IProjectCodeParser):
-
-    __slots__ = ('project_path', 'ignored_directories', '_graph', '_usages')
+class ProjectParser(IProjectParser):
+    __slots__ = ('project_path', 'ignored_directories', '_graph', '_possible_edges')
 
     def __init__(self, project_path: str | Path, ignored_directories: List = IGNORED_DIRS):
         self.project_path = Path(project_path).resolve()
         self.ignored_directories = ignored_directories
 
+        self._graph = Graph()
+        self._possible_edges: List[Edge] = []
+
     def parse(self) -> Graph:
         self._graph = Graph()
-        self._usages = {}
+        self._possible_edges = []
 
         self._build_project_structure()
-        self._analyze_usages()
+        self._analyze_edges()
+        self._add_hash_to_all_nodes()
 
         return self._graph
 
     def _build_project_structure(self):
         py_files = self._get_python_files()
 
-        root_node = Node(id=ROOT_NODE_NAME, type=TypeNode.DIRECTORY, source_type=TypeSourceNode.CODE)
+        root_node = Node(id=ROOT_NODE_NAME,
+                         name=ROOT_NODE_NAME,
+                         type=TypeNode.DIRECTORY,
+                         hash="",
+                         source=TypeSourceNode.CODE)
         self._graph.add_node(root_node)
 
         for file_path in py_files:
@@ -74,41 +81,92 @@ class ProjectCodeParser(IProjectCodeParser):
             current_path = Path('')
 
             for part in path_parts[:-1]:
-                str_current_path = str(current_path / part)
+                current_path = current_path / part
+                str_current_path = str(current_path)
 
                 if str_current_path not in self._graph:
-                    dir_node = Node(id=str_current_path, type=TypeNode.DIRECTORY, source_type=TypeSourceNode.CODE)
+                    dir_node = Node(id=str_current_path,
+                                    name=part,
+                                    type=TypeNode.DIRECTORY,
+                                    hash="",
+                                    source=TypeSourceNode.CODE)
                     self._graph.add_node(dir_node)
-                    self._graph.add_edge(parent_node_name,
-                                         dir_node.id,
-                                         TypeEdge.CONTAIN,
-                                         source_type=TypeSourceEdge.CODE)
+
+                    dir_edge = Edge(src=parent_node_name,
+                                    dest=dir_node.id,
+                                    type=TypeEdge.CONTAIN,
+                                    source=TypeSourceEdge.CODE)
+
+                    self._graph.add_edge(dir_edge)
 
                     parent_node_name = dir_node.id
                 else:
                     parent_node_name = str_current_path
 
-            file_node = Node(id=rel_path.as_posix(), type=TypeNode.FILE, source_type=TypeSourceNode.CODE)
+            file_node = Node(id=rel_path.as_posix(),
+                             name=path_parts[-1],
+                             type=TypeNode.FILE,
+                             hash="",
+                             source=TypeSourceNode.CODE)
 
             if self._graph.add_node(file_node):
-                self._graph.add_edge(parent_node_name, file_node.id, TypeEdge.CONTAIN, source_type=TypeSourceEdge.CODE)
+                file_edge = Edge(src=parent_node_name,
+                                 dest=file_node.id,
+                                 type=TypeEdge.CONTAIN,
+                                 source=TypeSourceEdge.CODE)
+                self._graph.add_edge(file_edge)
 
         def _build_code_nodes_from_file(path: Path):
-            visitor = FileCodeParser(path, self._graph, self.project_path)
-            visitor.parse()
-            usages: Dict[str, Set] = visitor.get_usages()
+            file_node_id = path.relative_to(self.project_path).as_posix()
+            parser = FileCodeParser(path, self.project_path)
+            file_graph = parser.parse()
 
-            for key, value in usages.items():
-                if key in self._usages:
-                    self._usages[key].update(value)
-                else:
-                    self._usages[key] = value.copy()
+            hashes = []
+            for node in file_graph.nodes.values():
+                if self._graph.add_node(node):
+                    hashes.append(node.hash)
+                    edge = Edge(
+                        src=file_node_id,
+                        dest=node.id,
+                        type=TypeEdge.CONTAIN,
+                        source=TypeSourceEdge.CODE,
+                    )
+                    self._graph.add_edge(edge)
+
+            self._graph.nodes[file_node_id].hash = stable_hash_from_hashes(hashes)
+
+            for edges in file_graph.edges.values():
+                for edge in edges:
+                    self._possible_edges.append(edge)
 
         _build_path_nodes_from_file(path)
         _build_code_nodes_from_file(path)
 
-    def _analyze_usages(self):
-        for source, usages in self._usages.items():
-            for target in usages:
-                if source in self._graph and target in self._graph:
-                    self._graph.add_edge(source, target, TypeEdge.USE, TypeSourceEdge.CODE)
+    def _analyze_edges(self):
+        for edge in self._possible_edges:
+            if edge.src in self._graph and edge.dest in self._graph:
+                self._graph.add_edge(edge)
+
+    def _add_hash_to_all_nodes(self, cur_id: str = ROOT_NODE_NAME) -> str:
+        cur_node = self._graph.nodes[cur_id]
+
+        if cur_node.type != TypeNode.DIRECTORY:
+            return cur_node.hash
+
+        hashes = []
+        contain_edges = self._graph.edges[cur_id]
+        for edge in contain_edges:
+            if edge.type != TypeEdge.CONTAIN:
+                continue
+            hash_node_id = self._add_hash_to_all_nodes(edge.dest)
+            hashes.append(hash_node_id)
+
+        cur_node.hash = stable_hash_from_hashes(hashes)
+        return cur_node.hash
+
+
+def stable_hash_from_hashes(hashes: List[str]) -> str:
+    hashes.sort()
+    combined = '\n'.join(hashes).encode('utf-8')
+    return hashlib.sha256(combined).hexdigest()[0:8]
+

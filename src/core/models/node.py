@@ -13,6 +13,12 @@ class TypeNode(str):
     BODY = 'body'
 
     ARC_ELEMENT = 'arc_elem'
+    USE_CASE = 'use_case'
+
+
+STRUCTURE_NODE_TYPES = [TypeNode.DIRECTORY, TypeNode.FILE]
+CODE_NODE_TYPES = [TypeNode.CLASS, TypeNode.FUNC, TypeNode.BODY]
+ADDITIONAL_NODE_TYPES = [TypeNode.ARC_ELEMENT, TypeNode.USE_CASE]
 
 
 class TypeSourceNode(str):
@@ -23,6 +29,7 @@ class TypeSourceNode(str):
 @dataclass
 class Node:
     id: str
+    name: str
     type: TypeNode
-    source_type: TypeSourceNode
-    edges: List[Edge] = field(default_factory=list)
+    hash: str = field(default="")
+    source: TypeSourceNode = field(default=TypeSourceNode.CODE)

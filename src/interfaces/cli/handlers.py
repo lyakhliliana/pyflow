@@ -5,7 +5,7 @@ from pathlib import Path
 from core.graph.difference import GraphComparator
 from core.models.graph import Graph
 from core.utils.validatie import is_git_url
-from core.graph.parsing.project import ProjectCodeParser
+from core.graph.parsing.project import ProjectParser
 from core.graph.builder import ADDITIONAL_SECTION_NAME, CODE_SECTION_NAME, UNION_SECTION_NAME, CSVGraphBuilder
 from core.graph.exporter import CSVGraphExporter
 from core.utils.git_handler import GitHandler
@@ -42,7 +42,7 @@ def handle_extract(args: Namespace):
         return
 
     try:
-        parser = ProjectCodeParser(source)
+        parser = ProjectParser(source)
         graph = parser.parse()
     except Exception as e:
         print(f"error parsing project: {args.source}: {str(e)}")

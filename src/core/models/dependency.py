@@ -3,7 +3,7 @@ from typing import List, Optional
 
 
 @dataclass
-class Object:
+class ImportObject:
     fullname: str
     alias: Optional[str]
 
@@ -12,4 +12,4 @@ class Object:
 class Import:
     fullname: str
     alias: Optional[str]
-    objects: List[Object] = field(default_factory=list)
+    objects: List[ImportObject] = field(default_factory=list)

@@ -1,9 +1,10 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 class TypeEdge(str):
     USE = 'use'
     CONTAIN = 'contain'
+    COUPLING = "coupling"
 
 
 class TypeSourceEdge(str):
@@ -13,6 +14,7 @@ class TypeSourceEdge(str):
 
 @dataclass
 class Edge:
-    id: str
+    src: str
+    dest: str
     type: TypeEdge
-    source_type: TypeSourceEdge
+    source: TypeSourceEdge = field(default=TypeSourceEdge.CODE)

@@ -29,8 +29,8 @@ class CSVGraphExporter(IGraphExporter):
             graph: Экземпляр графа для экспорта
             directory_path: Путь к директории для сохранения файлов
                 (создастся при отсутствии). Файлы будут:
-                - nodes.csv: [id,type,source_type]
-                - edges.csv: [source_id,target_id,type,source_type]
+                - nodes.csv: [id, name, type, hash, source]
+                - edges.csv: [src, dest, type, source]
         """
         Path(directory_path).mkdir(parents=True, exist_ok=True)
         nodes_path = os.path.join(directory_path, "nodes.csv")
@@ -44,17 +44,26 @@ class CSVGraphExporter(IGraphExporter):
             Path(file_path).parent.mkdir(parents=True, exist_ok=True)
 
             with open(file_path, 'w', newline='', encoding='utf-8') as f:
-                writer = csv.DictWriter(f, fieldnames=['id', 'type', 'source_type'], quoting=csv.QUOTE_MINIMAL)
+                writer = csv.DictWriter(f,
+                                        fieldnames=['id', 'name', 'type', 'hash', 'source'],
+                                        quoting=csv.QUOTE_MINIMAL)
                 writer.writeheader()
 
                 for node in graph.nodes.values():
-                    writer.writerow({'id': node.id, 'type': node.type, 'source_type': node.source_type})
+                    writer.writerow({
+                        'id': node.id,
+                        'name': node.name,
+                        'type': node.type,
+                        'hash': node.hash,
+                        'source': node.source
+                    })
 
             logger.info(f"Успешно сохранено {len(graph.nodes)} узлов в {file_path}")
 
         except (IOError, PermissionError) as e:
-            logger.critical(f"Ошибка записи файла узлов: {str(e)}")
-            raise
+            text_error = f"Ошибка записи файла узлов: {str(e)}"
+            logger.critical(text_error)
+            raise Exception(text_error)
 
     @staticmethod
     def _save_edges(graph: Graph, file_path: str) -> None:
@@ -62,24 +71,18 @@ class CSVGraphExporter(IGraphExporter):
             Path(file_path).parent.mkdir(parents=True, exist_ok=True)
 
             with open(file_path, 'w', newline='', encoding='utf-8') as f:
-                writer = csv.DictWriter(f,
-                                        fieldnames=['source_id', 'target_id', 'type', 'source_type'],
-                                        quoting=csv.QUOTE_MINIMAL)
+                writer = csv.DictWriter(f, fieldnames=['src', 'dest', 'type', 'source'], quoting=csv.QUOTE_MINIMAL)
                 writer.writeheader()
 
                 edge_count = 0
-                for node in graph.nodes.values():
-                    for edge in node.edges:
-                        writer.writerow({
-                            'source_id': node.id,
-                            'target_id': edge.id,
-                            'type': edge.type,
-                            'source_type': edge.source_type
-                        })
+                for edges in graph.edges.values():
+                    for edge in edges:
+                        writer.writerow({'src': edge.src, 'dest': edge.dest, 'type': edge.type, 'source': edge.source})
                         edge_count += 1
 
             logger.info(f"Успешно сохранено {edge_count} связей в {file_path}")
 
         except (IOError, PermissionError) as e:
-            logger.critical(f"Ошибка записи файла связей: {str(e)}")
-            raise
+            text_error = f"Ошибка записи файла связей: {str(e)}"
+            logger.critical(text_error)
+            raise Exception(text_error)
