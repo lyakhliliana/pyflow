@@ -7,12 +7,12 @@ import os
 
 from src.core.graph.parsing.file import FileCodeParser
 from core.models.edge import Edge, TypeEdge, TypeSourceEdge
-from core.models.node import Node, TypeNode, TypeSourceNode
+from core.models.node import ROOT_NODE_NAME, Node, TypeNode, TypeSourceNode
 from core.models.graph import Graph
+from src.core.utils.hash import stable_hash_from_hashes
 
 logger = logging.getLogger(__name__)
 
-ROOT_NODE_NAME = "root"
 IGNORED_DIRS = ["venv", "tmp"]
 
 
@@ -43,7 +43,7 @@ class ProjectParser(IProjectParser):
 
         self._build_project_structure()
         self._analyze_edges()
-        self._add_hash_to_all_nodes()
+        self._graph.calculate_all_hashes()
 
         return self._graph
 
@@ -121,10 +121,8 @@ class ProjectParser(IProjectParser):
             parser = FileCodeParser(path, self.project_path)
             file_graph = parser.parse()
 
-            hashes = []
             for node in file_graph.nodes.values():
                 if self._graph.add_node(node):
-                    hashes.append(node.hash)
                     edge = Edge(
                         src=file_node_id,
                         dest=node.id,
@@ -132,8 +130,6 @@ class ProjectParser(IProjectParser):
                         source=TypeSourceEdge.CODE,
                     )
                     self._graph.add_edge(edge)
-
-            self._graph.nodes[file_node_id].hash = stable_hash_from_hashes(hashes)
 
             for edges in file_graph.edges.values():
                 for edge in edges:
@@ -146,26 +142,3 @@ class ProjectParser(IProjectParser):
         for edge in self._possible_edges:
             if edge.src in self._graph and edge.dest in self._graph:
                 self._graph.add_edge(edge)
-
-    def _add_hash_to_all_nodes(self, cur_id: str = ROOT_NODE_NAME) -> str:
-        cur_node = self._graph.nodes[cur_id]
-
-        if cur_node.type != TypeNode.DIRECTORY:
-            return cur_node.hash
-
-        hashes = []
-        contain_edges = self._graph.edges[cur_id]
-        for edge in contain_edges:
-            if edge.type != TypeEdge.CONTAIN:
-                continue
-            hash_node_id = self._add_hash_to_all_nodes(edge.dest)
-            hashes.append(hash_node_id)
-
-        cur_node.hash = stable_hash_from_hashes(hashes)
-        return cur_node.hash
-
-
-def stable_hash_from_hashes(hashes: List[str]) -> str:
-    hashes.sort()
-    combined = '\n'.join(hashes).encode('utf-8')
-    return hashlib.sha256(combined).hexdigest()[0:8]

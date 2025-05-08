@@ -103,6 +103,7 @@ class CSVGraphBuilder(IGraphBuilder):
         try:
             CSVGraphBuilder._process_additional_nodes(nodes_path, graph)
             CSVGraphBuilder._process_additional_edges(file_path=edges_path, graph=graph)
+            graph.calculate_all_hashes()
 
         except FileNotFoundError as e:
             logger.critical(f"Файл не найден: {str(e)}")

@@ -3,6 +3,7 @@ from typing import Dict, List
 
 from core.models.edge import Edge
 
+ROOT_NODE_NAME = "root"
 
 class TypeNode(str):
     DIRECTORY = 'directory'

@@ -2,8 +2,9 @@ from collections import defaultdict
 import logging
 from typing import Dict, Set, List
 
-from core.models.edge import Edge
-from core.models.node import Node
+from core.models.edge import Edge, TypeEdge
+from core.models.node import ADDITIONAL_NODE_TYPES, CODE_NODE_TYPES, ROOT_NODE_NAME, Node
+from src.core.utils.hash import stable_hash_from_hashes
 
 logger = logging.getLogger(__name__)
 
@@ -41,3 +42,45 @@ class Graph:
         self.inv_edges[edge.dest].add(edge.src)
 
         return True
+    
+    def calculate_all_hashes(self):
+
+        def recursive_structure_hash(cur_id: str = ROOT_NODE_NAME) -> str:
+            cur_node = self.nodes[cur_id]
+
+            if cur_node.type in CODE_NODE_TYPES:
+                return cur_node.hash
+
+            hashes = []
+            contain_edges = self.edges.get(cur_id, [])
+            for edge in contain_edges:
+                if edge.type != TypeEdge.CONTAIN:
+                    continue
+                hash_node_id = recursive_structure_hash(edge.dest)
+                hashes.append(hash_node_id)
+
+            cur_node.hash = stable_hash_from_hashes(hashes)
+            return cur_node.hash
+        
+        def recursive_additional_hash(cur_id: str = ROOT_NODE_NAME) -> str:
+            cur_node = self.nodes[cur_id]
+
+            if cur_node.type not in ADDITIONAL_NODE_TYPES or cur_node.hash != "":
+                return cur_node.hash
+
+            hashes = []
+            contain_edges = self.edges.get(cur_id, [])
+            for edge in contain_edges:
+                if edge.type != TypeEdge.CONTAIN:
+                    continue
+                hash_node_id = recursive_additional_hash(edge.dest)
+                hashes.append(hash_node_id)
+
+            cur_node.hash = stable_hash_from_hashes(hashes)
+            return cur_node.hash
+        
+        recursive_structure_hash()
+
+        for node in self.nodes.values():
+            if node.type in ADDITIONAL_NODE_TYPES:
+                recursive_additional_hash(node.id)
