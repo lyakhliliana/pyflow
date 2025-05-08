@@ -33,9 +33,9 @@ class Graph:
 
         if with_check and edge.dest not in self.nodes:
             return False
-        
+
         if edge.dest in self.inv_edges and edge.src in self.inv_edges[edge.dest]:
-            return False
+            return True
 
         self.edges[edge.src].append(edge)
         self.inv_edges[edge.dest].add(edge.src)

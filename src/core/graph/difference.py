@@ -1,49 +1,97 @@
-from dataclasses import dataclass, field
-from typing import Dict, Set, Tuple
-from collections import defaultdict
+from copy import deepcopy
 
 from core.models.graph import Graph
 
+DIFFERENCE_STATUS_FIELD = 'difference_status'
 
-@dataclass
-class GraphDifference:
-    added_nodes: Set[str] = field(default_factory=set)
-    removed_nodes: Set[str] = field(default_factory=set)
-    added_edges: Dict[str, Set[Tuple[str, str]]] = field(default_factory=lambda: defaultdict(set))
-    removed_edges: Dict[str, Set[Tuple[str, str]]] = field(default_factory=lambda: defaultdict(set))
+
+class TypeDiff(str):
+    NEW = 'new'
+    DELETED = 'deleted'
+
+    CHANGED = 'changed'
+    UNCHACHGED = 'unchanged'
 
 
 class GraphComparator:
 
     @staticmethod
-    def get_difference(old_graph: Graph, new_graph: Graph) -> GraphDifference:
-        diff = GraphDifference()
+    def get_difference(old_graph: Graph, new_graph: Graph) -> Graph:
+        """
+        Compute a diff-annotated graph showing changes from old_graph to new_graph.
+
+        Args:
+            old_graph (Graph): The original graph.
+            new_graph (Graph): The updated graph.
+
+        Returns:
+            Graph: A graph whose nodes and edges carry a meta flag of type TypeDiff.
+        """
+
+        result_graph = Graph()
 
         old_nodes = set(old_graph.nodes.keys())
         new_nodes = set(new_graph.nodes.keys())
-
-        diff.added_nodes = new_nodes - old_nodes
-        diff.removed_nodes = old_nodes - new_nodes
-
+        added_nodes = new_nodes - old_nodes
+        deleted_nodes = old_nodes - new_nodes
         common_nodes = old_nodes & new_nodes
+
+        # Add new nodes
+        for node_id in added_nodes:
+            node = deepcopy(new_graph.nodes[node_id])
+            node.meta[DIFFERENCE_STATUS_FIELD] = TypeDiff.NEW
+            result_graph.add_node(node)
+
+        # Add deleted nodes
+        for node_id in deleted_nodes:
+            node = deepcopy(old_graph.nodes[node_id])
+            node.meta[DIFFERENCE_STATUS_FIELD] = TypeDiff.DELETED
+            result_graph.add_node(node)
+
+        # Add common nodes, marking changed or unchanged
         for node_id in common_nodes:
-            old_edges = {(e.id, e.type) for e in old_graph.nodes[node_id].edges}
-            new_edges = {(e.id, e.type) for e in new_graph.nodes[node_id].edges}
+            old_node = old_graph.nodes[node_id]
+            new_node = deepcopy(new_graph.nodes[node_id])
+            status = TypeDiff.CHANGED if old_node.hash != new_node.hash else TypeDiff.UNCHACHGED
+            new_node.meta[DIFFERENCE_STATUS_FIELD] = status
+            result_graph.add_node(new_node)
 
-            added = new_edges - old_edges
-            removed = old_edges - new_edges
+        # Determine edge differences for new nodes
+        for node_id in added_nodes:
+            for edge in new_graph.edges.get(node_id, []):
+                result_edge = deepcopy(edge)
+                result_edge.meta[DIFFERENCE_STATUS_FIELD] = TypeDiff.NEW
+                result_graph.add_edge(result_edge)
 
-            if added:
-                diff.added_edges[node_id].update(added)
-            if removed:
-                diff.removed_edges[node_id].update(removed)
+        # Determine edge differences for deleted nodes
+        for node_id in deleted_nodes:
+            for edge in old_graph.edges.get(node_id, []):
+                result_edge = deepcopy(edge)
+                result_edge.meta[DIFFERENCE_STATUS_FIELD] = TypeDiff.DELETED
+                result_graph.add_edge(result_edge)
 
-        for node_id in diff.added_nodes:
-            for edge in new_graph.nodes[node_id].edges:
-                diff.added_edges[node_id].add((edge.id, edge.type))
+        # Determine edge differences for nodes present in both graphs
+        for node_id in common_nodes:
+            old_edges = set(old_graph.edges.get(node_id, []))
+            new_edges = set(new_graph.edges.get(node_id, []))
 
-        for node_id in diff.removed_nodes:
-            for edge in old_graph.nodes[node_id].edges:
-                diff.removed_edges[node_id].add((edge.id, edge.type))
+            added_edges = new_edges - old_edges
+            deleted_edges = old_edges - new_edges
+            common_edges = old_edges & new_edges
 
-        return diff
+            for edge in added_edges:
+                result_edge = deepcopy(edge)
+                result_edge.meta[DIFFERENCE_STATUS_FIELD] = TypeDiff.NEW
+                result_graph.add_edge(result_edge)
+
+            for edge in deleted_edges:
+                result_edge = deepcopy(edge)
+                result_edge.meta[DIFFERENCE_STATUS_FIELD] = TypeDiff.DELETED
+                result_graph.add_edge(result_edge)
+
+            for edge in common_edges:
+                result_edge = deepcopy(edge)
+                result_edge.meta[DIFFERENCE_STATUS_FIELD] = TypeDiff.UNCHACHGED
+                result_graph.add_edge(result_edge)
+
+        return result_graph

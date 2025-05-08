@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List
+from typing import Dict, List
 
 from core.models.edge import Edge
 
@@ -33,3 +33,4 @@ class Node:
     type: TypeNode
     hash: str = field(default="")
     source: TypeSourceNode = field(default=TypeSourceNode.CODE)
+    meta: Dict = field(default_factory=dict)

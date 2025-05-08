@@ -82,6 +82,20 @@ def handle_visualise(args: Namespace):
             print(f"error visualize graph {source_path}: {str(e)}")
             return
 
+    if args.mode == "diff":
+        try:
+            graph = CSVGraphBuilder.build_diff(source_path)
+        except Exception as e:
+            print(f"error extract graph {source_path}: {str(e)}")
+            return
+        vis_path = os.path.join(source_path, VIS_NAME)
+
+        try:
+            HtmlGraphVisualizer.create_difference(graph, vis_path)
+        except Exception as e:
+            print(f"error visualize difference graph {source_path}: {str(e)}")
+            return
+
 
 def handle_union(args: Namespace):
     source_path = Path(args.source)
@@ -106,36 +120,38 @@ def handle_union(args: Namespace):
 
 
 def handle_diff(args: Namespace):
-    source_path = Path(args.source)
-    if not source_path.exists():
-        print(f"source path is not exist: {args.source}")
+    first_path = Path(args.first_path)
+    second_path = Path(args.second_path)
+    output_dir = Path(args.output_dir)
+    if not first_path.exists():
+        print(f"first graph path is not exist: {args.first_path}")
+        return
+    if not second_path.exists():
+        print(f"second graph path is not exist: {args.second_path}")
         return
 
     first_graph: Graph
     second_graph: Graph
     try:
-        graph_path = os.path.join(source_path, args.first)
-        first_graph = CSVGraphBuilder.build(graph_path)
+        first_graph = CSVGraphBuilder.build(first_path)
     except Exception as e:
-        print(f"error extract first graph {graph_path}: {str(e)}")
+        print(f"error extract first graph {first_path}: {str(e)}")
         return
 
     try:
-        graph_path = os.path.join(source_path, args.second)
-        second_graph = CSVGraphBuilder.build(graph_path)
+        second_graph = CSVGraphBuilder.build(second_path)
     except Exception as e:
-        print(f"error extract first graph {graph_path}: {str(e)}")
+        print(f"error extract first graph {second_path}: {str(e)}")
         return
 
     try:
-        difference = GraphComparator.get_difference(first_graph, second_graph)
+        difference_graph = GraphComparator.get_difference(first_graph, second_graph)
     except Exception as e:
         print(f"error get difference between {args.first} and {args.second}: {str(e)}")
         return
 
     try:
-        vis_path = os.path.join(source_path, DIFF_NAME)
-        HtmlGraphVisualizer.create_difference(first_graph, second_graph, difference, vis_path)
+        CSVGraphExporter.save_diff(difference_graph, output_dir)
     except Exception as e:
-        print(f"error visualize difference graph between {args.first} and {args.second}: {str(e)}")
+        print(f"error saving difference graph {args.output_dir}: {str(e)}")
         return

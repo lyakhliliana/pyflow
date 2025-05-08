@@ -24,15 +24,15 @@ def main():
     visualise_parser.add_argument("source", help="Path to saved graph file (.json/.graphml)")
     visualise_parser.add_argument("-m",
                                   "--mode",
-                                  choices=["basic", "union"],
+                                  choices=["basic", "diff"],
                                   default="basic",
                                   help="Visualization mode(basic, union)")
 
     # Парсер для команды diff
     diff_parser = subparsers.add_parser("diff", help="Visualize difference from graphs")
-    diff_parser.add_argument("source", help="Path to source directory with project graphs")
-    diff_parser.add_argument("first", help="Graph name from a directory with project graphs")
-    diff_parser.add_argument("second", help="Graph name from a directory with project graphs")
+    diff_parser.add_argument("first_path", help="Graph path from a directory with project graphs")
+    diff_parser.add_argument("second_path", help="Graph path from a directory with project graphs")
+    diff_parser.add_argument("output_dir", help="Output directory (default: current directory)")
 
     args = parser.parse_args()
 

@@ -15,4 +15,5 @@ union:
 visualize:
 	python3 -B -m interfaces.cli.cli visualize tmp/results/version1/union
 diff:
-	python3 -B -m interfaces.cli.cli diff tmp/results/version1 union code
+	python3 -B -m interfaces.cli.cli diff tmp/results/version1/code tmp/results/version2/code tmp/results/difference
+	python3 -B -m interfaces.cli.cli visualize -m diff tmp/results/difference

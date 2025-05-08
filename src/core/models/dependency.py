@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 
 @dataclass
@@ -13,3 +13,4 @@ class Import:
     fullname: str
     alias: Optional[str]
     objects: List[ImportObject] = field(default_factory=list)
+    meta: Dict = field(default_factory=dict)
