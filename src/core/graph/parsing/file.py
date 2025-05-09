@@ -155,7 +155,7 @@ class FileCodeParser(IFileCodeParser):
             base_name = parts[0]
 
             local_candidate = f"{self.rel_path_to_project_root}#{base_name}"
-            if local_candidate in self._graph.nodes:
+            if local_candidate in self._graph.get_all_nodes():
                 use_edge = Edge(src=current_entity, dest=local_candidate, type=TypeEdge.USE, source=TypeSourceEdge.CODE)
                 added = self._graph.add_edge(use_edge)
                 if not added:

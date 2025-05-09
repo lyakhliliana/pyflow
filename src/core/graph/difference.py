@@ -38,42 +38,42 @@ class GraphComparator:
 
         # Add new nodes
         for node_id in added_nodes:
-            node = deepcopy(new_graph.nodes[node_id])
+            node = deepcopy(new_graph.get_node(node_id))
             node.meta[DIFFERENCE_STATUS_FIELD] = TypeDiff.NEW
             result_graph.add_node(node)
 
         # Add deleted nodes
         for node_id in deleted_nodes:
-            node = deepcopy(old_graph.nodes[node_id])
+            node = deepcopy(old_graph.get_node(node_id))
             node.meta[DIFFERENCE_STATUS_FIELD] = TypeDiff.DELETED
             result_graph.add_node(node)
 
         # Add common nodes, marking changed or unchanged
         for node_id in common_nodes:
-            old_node = old_graph.nodes[node_id]
-            new_node = deepcopy(new_graph.nodes[node_id])
+            old_node = old_graph.get_node(node_id)
+            new_node = deepcopy(new_graph.get_node(node_id))
             status = TypeDiff.CHANGED if old_node.hash != new_node.hash else TypeDiff.UNCHACHGED
             new_node.meta[DIFFERENCE_STATUS_FIELD] = status
             result_graph.add_node(new_node)
 
         # Determine edge differences for new nodes
         for node_id in added_nodes:
-            for edge in new_graph.edges.get(node_id, []):
+            for edge in new_graph.get_edges_out(node_id):
                 result_edge = deepcopy(edge)
                 result_edge.meta[DIFFERENCE_STATUS_FIELD] = TypeDiff.NEW
                 result_graph.add_edge(result_edge)
 
         # Determine edge differences for deleted nodes
         for node_id in deleted_nodes:
-            for edge in old_graph.edges.get(node_id, []):
+            for edge in old_graph.get_edges_out(node_id):
                 result_edge = deepcopy(edge)
                 result_edge.meta[DIFFERENCE_STATUS_FIELD] = TypeDiff.DELETED
                 result_graph.add_edge(result_edge)
 
         # Determine edge differences for nodes present in both graphs
         for node_id in common_nodes:
-            old_edges = set(old_graph.edges.get(node_id, []))
-            new_edges = set(new_graph.edges.get(node_id, []))
+            old_edges = set(old_graph.get_edges_out(node_id))
+            new_edges = set(new_graph.get_edges_out(node_id))
 
             added_edges = new_edges - old_edges
             deleted_edges = old_edges - new_edges

@@ -2,14 +2,16 @@ from argparse import Namespace
 import logging
 import os
 from pathlib import Path
-from core.graph.difference import GraphComparator
+
 from core.models.graph import Graph
 from core.utils.validatie import is_git_url
+from core.utils.git_handler import GitHandler
 from core.graph.parsing.project import ProjectParser
+from core.graph.difference import GraphComparator
 from core.graph.builder import ADDITIONAL_SECTION_NAME, CODE_SECTION_NAME, UNION_SECTION_NAME, CSVGraphBuilder
 from core.graph.exporter import CSVGraphExporter
-from core.utils.git_handler import GitHandler
-from src.core.graph.visualise import HtmlGraphVisualizer
+from core.graph.visualise import HtmlGraphVisualizer
+from core.graph.contractor import GraphContractor
 
 logger = logging.getLogger(__name__)
 
@@ -20,11 +22,13 @@ DIFF_NAME = "diff.html"
 def handle_extract(args: Namespace):
 
     def _prepare_source(args) -> Path:
-        if is_git_url(args.source):
-            git_dir = GitHandler.clone_repo(args.source, destination=args.output_dir)
+        if is_git_url(args.link):
+            git_dir = GitHandler.clone_repo(args.link, destination=args.output_dir, force_clone=True)
             if git_dir is None:
-                print(f"error while cloning directory: {args.source}")
-            return git_dir
+                print(f"error while cloning directory: {args.link}")
+                return
+            src_dir = os.path.join(git_dir, args.source)
+            return src_dir
 
         source_path = Path(args.source)
         if not source_path.exists():
@@ -154,4 +158,32 @@ def handle_diff(args: Namespace):
         CSVGraphExporter.save_diff(difference_graph, output_dir)
     except Exception as e:
         print(f"error saving difference graph {args.output_dir}: {str(e)}")
+        return
+
+
+def handle_contract(args: Namespace):
+    source_path = Path(args.source)
+    if not source_path.exists():
+        print(f"source path is not exist: {args.source}")
+        return
+
+    output_path = Path(args.output)
+
+    try:
+        graph = CSVGraphBuilder.build(source_path)
+    except Exception as e:
+        print(f"error extract graph {source_path}: {str(e)}")
+        return
+
+    try:
+        contractor = GraphContractor(graph)
+        contracted_graph = contractor.contract_graph(args.elements)
+    except Exception as e:
+        print(f"error contract graph: {str(e)}")
+        return
+
+    try:
+        CSVGraphExporter.save(contracted_graph, output_path)
+    except Exception as e:
+        print(f"error saving contracted graph {output_path}: {str(e)}")
         return

@@ -1,80 +1,48 @@
+from typing import Callable
+from core.graph.hasher import Hasher
+from core.models.edge import Edge
 from core.models.graph import Graph
-from core.models.edge import Edge, TypeEdge
-from core.models.node import TypeNode
-
-
-class FilterMode:
-    FULL = 'full'
-    STRUCT = 'struct'
-    OBJECT_LINKS = 'object_links'
-    FILE_LINKS = 'file_links'
+from core.models.node import CODE_NODE_TYPES, Node
 
 
 class Filter:
 
     @staticmethod
-    def get_object_links(graph: Graph) -> Graph:
-        filtered_graph = Graph()
-        for _, node in graph.nodes.items():
-            if node.type not in [TypeNode.BODY, TypeNode.CLASS, TypeNode.FUNC]:
-                continue
-            filtered_graph.add_node(node)
+    def apply_nodes_filter(graph: Graph, nodes_filter: Callable[[Node], bool]) -> Graph:
+        result_graph = Graph()
 
-        for _, node in filtered_graph.nodes.items():
-            filtered_links = [
-                link for link in node.edges if link.type in [TypeEdge.USE] and link.id in filtered_graph.nodes
-            ]
-            node.edges = filtered_links
+        for node in graph.get_all_nodes():
+            if nodes_filter(node):
+                result_graph.add_node(node)
 
-        return filtered_graph
+        for node in result_graph.get_all_nodes():
 
-    @staticmethod
-    def get_struct(graph: Graph) -> Graph:
-        filtered_graph = Graph()
+            for edge in graph.get_edges_out(node.id):
+                if edge.src in result_graph.nodes and edge.dest in result_graph.nodes:
+                    result_graph.add_edge(edge)
 
-        for _, node in graph.nodes.items():
-            filtered_links = [link for link in node.edges if link.type in [TypeEdge.CONTAIN] and link.id in graph.nodes]
-            node.edges = filtered_links
-            filtered_graph.add_node(node)
-
-        return filtered_graph
+        Hasher.recalculate(graph)
+        return result_graph
 
     @staticmethod
-    def full(graph: Graph) -> Graph:
-        filtered_graph = Graph()
+    def apply_edges_filter(graph: Graph, edges_filter: Callable[[Edge], bool]) -> Graph:
+        result_graph = Graph()
 
-        for _, node in graph.nodes.items():
-            filtered_links = [link for link in node.edges if link.id in graph.nodes]
-            node.edges = filtered_links
-            filtered_graph.add_node(node)
+        for node in graph.get_all_nodes():
+            result_graph.add_node(node)
 
-        return filtered_graph
+        for node in graph.get_all_nodes():
+
+            for edge in graph.get_edges_out(node.id):
+                if edges_filter(edge):
+                    result_graph.add_edge(edge)
+
+        Hasher.recalculate(graph)
+        return result_graph
+
+
+class CommonCasesFilter:
 
     @staticmethod
-    def get_files_links(graph: Graph) -> Graph:
-        filtered_graph = Graph()
-        for _, node in graph.nodes.items():
-            if node.type != TypeNode.FILE:
-                continue
-            filtered_graph.add_node(node)
-
-        for _, node in filtered_graph.nodes.items():
-            new_links = set()
-            for link in node.edges:
-                cur_object = graph.nodes[link.id]
-                for object_link in cur_object.edges:
-                    file_where_object_exist = object_link.id.split('#')[0]
-                    if object_link.type == TypeEdge.USE and node.id != file_where_object_exist:
-                        new_links.add(file_where_object_exist)
-
-            node.edges = [Edge(link, TypeEdge.USE) for link in new_links]
-
-        return filtered_graph
-
-
-FILTER_BY_MODE = {
-    FilterMode.FULL: Filter.full,
-    FilterMode.STRUCT: Filter.get_struct,
-    FilterMode.OBJECT_LINKS: Filter.get_object_links,
-    FilterMode.FILE_LINKS: Filter.get_files_links
-}
+    def get_code_elements(graph: Graph) -> Graph:
+        return Filter.apply_nodes_filter(graph, lambda node: node.type in CODE_NODE_TYPES)

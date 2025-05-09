@@ -7,7 +7,9 @@ activate:
 uninstall_cache:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 
-
+git_example:
+	python3 -B -m interfaces.cli.cli extract ./src -o tmp/results/version1 -l https://github.com/aedobrynin/whiteboard-v2.git
+	python3 -B -m interfaces.cli.cli visualize tmp/results/version1/code
 extract:
 	python3 -B -m interfaces.cli.cli extract ./src -o tmp/results/version1
 union:

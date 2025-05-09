@@ -1,15 +1,14 @@
 from abc import ABC, abstractmethod
-import hashlib
 import logging
 from pathlib import Path
-from typing import List, Set
+from typing import List
 import os
 
-from src.core.graph.parsing.file import FileCodeParser
+from core.graph.hasher import Hasher
+from core.graph.parsing.file import FileCodeParser
 from core.models.edge import Edge, TypeEdge, TypeSourceEdge
 from core.models.node import ROOT_NODE_NAME, Node, TypeNode, TypeSourceNode
 from core.models.graph import Graph
-from src.core.utils.hash import stable_hash_from_hashes
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +42,7 @@ class ProjectParser(IProjectParser):
 
         self._build_project_structure()
         self._analyze_edges()
-        self._graph.calculate_all_hashes()
+        Hasher.recalculate(self._graph)
 
         return self._graph
 
@@ -84,7 +83,7 @@ class ProjectParser(IProjectParser):
                 current_path = current_path / part
                 str_current_path = str(current_path)
 
-                if str_current_path not in self._graph:
+                if str_current_path not in self._graph.nodes:
                     dir_node = Node(id=str_current_path,
                                     name=part,
                                     type=TypeNode.DIRECTORY,
@@ -121,7 +120,7 @@ class ProjectParser(IProjectParser):
             parser = FileCodeParser(path, self.project_path)
             file_graph = parser.parse()
 
-            for node in file_graph.nodes.values():
+            for node in file_graph.get_all_nodes():
                 if self._graph.add_node(node):
                     edge = Edge(
                         src=file_node_id,
@@ -131,14 +130,12 @@ class ProjectParser(IProjectParser):
                     )
                     self._graph.add_edge(edge)
 
-            for edges in file_graph.edges.values():
-                for edge in edges:
-                    self._possible_edges.append(edge)
+            for edge in file_graph.get_all_edges():
+                self._possible_edges.append(edge)
 
         _build_path_nodes_from_file(path)
         _build_code_nodes_from_file(path)
 
     def _analyze_edges(self):
         for edge in self._possible_edges:
-            if edge.src in self._graph and edge.dest in self._graph:
-                self._graph.add_edge(edge)
+            self._graph.add_edge(edge)

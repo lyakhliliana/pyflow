@@ -5,7 +5,7 @@ from pathlib import Path
 import logging
 
 from core.models.graph import Graph
-from src.core.graph.difference import DIFFERENCE_STATUS_FIELD
+from core.graph.difference import DIFFERENCE_STATUS_FIELD
 
 logger = logging.getLogger(__name__)
 
@@ -23,12 +23,12 @@ class CSVGraphExporter(IGraphExporter):
     @staticmethod
     def save(graph: Graph, directory_path: str) -> None:
         """
-        Сохраняет граф в CSV-файлы в указанной директории.
+        Exports the graph to CSV files in the specified directory.
 
         Args:
-            graph: Экземпляр графа для экспорта
-            directory_path: Путь к директории для сохранения файлов
-                (создастся при отсутствии). Файлы будут:
+            graph: Graph instance to export
+            directory_path: Path to the directory where files will be saved
+                (will be created if it doesn't exist). Files will be:
                 - nodes.csv: [id, name, type, hash, source]
                 - edges.csv: [src, dest, type, source]
         """
@@ -41,12 +41,12 @@ class CSVGraphExporter(IGraphExporter):
     @staticmethod
     def save_diff(graph: Graph, directory_path: str) -> None:
         """
-        Сохраняет граф в CSV-файлы в указанной директории.
+        Exports the graph with difference information to CSV files in the specified directory.
 
         Args:
-            graph: Экземпляр графа для экспорта
-            directory_path: Путь к директории для сохранения файлов
-                (создастся при отсутствии). Файлы будут:
+            graph: Graph instance to export
+            directory_path: Path to the directory where files will be saved
+                (will be created if it doesn't exist). Files will be:
                 - nodes.csv: [id, name, type, diff_status, source]
                 - edges.csv: [src, dest, type, diff_status, source]
         """
@@ -67,7 +67,7 @@ class CSVGraphExporter(IGraphExporter):
                                         quoting=csv.QUOTE_MINIMAL)
                 writer.writeheader()
 
-                for node in graph.nodes.values():
+                for node in graph.get_all_nodes():
                     writer.writerow({
                         'id': node.id,
                         'name': node.name,
@@ -76,10 +76,10 @@ class CSVGraphExporter(IGraphExporter):
                         'source': node.source
                     })
 
-            logger.info(f"Успешно сохранено {len(graph.nodes)} узлов в {file_path}")
+            logger.info(f"Successfully saved {len(graph.nodes)} nodes to {file_path}")
 
         except (IOError, PermissionError) as e:
-            text_error = f"Ошибка записи файла узлов: {str(e)}"
+            text_error = f"Error writing nodes file: {str(e)}"
             logger.critical(text_error)
             raise Exception(text_error)
 
@@ -93,15 +93,14 @@ class CSVGraphExporter(IGraphExporter):
                 writer.writeheader()
 
                 edge_count = 0
-                for edges in graph.edges.values():
-                    for edge in edges:
-                        writer.writerow({'src': edge.src, 'dest': edge.dest, 'type': edge.type, 'source': edge.source})
-                        edge_count += 1
+                for edge in graph.get_all_edges():
+                    writer.writerow({'src': edge.src, 'dest': edge.dest, 'type': edge.type, 'source': edge.source})
+                    edge_count += 1
 
-            logger.info(f"Успешно сохранено {edge_count} связей в {file_path}")
+            logger.info(f"Successfully saved {edge_count} edges to {file_path}")
 
         except (IOError, PermissionError) as e:
-            text_error = f"Ошибка записи файла связей: {str(e)}"
+            text_error = f"Error writing edges file: {str(e)}"
             logger.critical(text_error)
             raise Exception(text_error)
 
@@ -116,9 +115,9 @@ class CSVGraphExporter(IGraphExporter):
                                         quoting=csv.QUOTE_MINIMAL)
                 writer.writeheader()
 
-                for node in graph.nodes.values():
+                for node in graph.get_all_nodes():
                     if DIFFERENCE_STATUS_FIELD not in node.meta:
-                        logger.warning(f"Node {node.id} do not contain {DIFFERENCE_STATUS_FIELD} filed in meta data")
+                        logger.warning(f"Node {node.id} does not contain {DIFFERENCE_STATUS_FIELD} field in meta data")
                         continue
                     writer.writerow({
                         'id': node.id,
@@ -128,10 +127,10 @@ class CSVGraphExporter(IGraphExporter):
                         'source': node.source
                     })
 
-            logger.info(f"Успешно сохранено {len(graph.nodes)} узлов в {file_path}")
+            logger.info(f"Successfully saved {len(graph.nodes)} nodes to {file_path}")
 
         except (IOError, PermissionError) as e:
-            text_error = f"Ошибка записи файла узлов: {str(e)}"
+            text_error = f"Error writing nodes file: {str(e)}"
             logger.critical(text_error)
             raise Exception(text_error)
 
@@ -147,25 +146,24 @@ class CSVGraphExporter(IGraphExporter):
                 writer.writeheader()
 
                 edge_count = 0
-                for edges in graph.edges.values():
-                    for edge in edges:
-                        if DIFFERENCE_STATUS_FIELD not in edge.meta:
-                            logger.warning(
-                                f"Edge {edge.src} -> {edge.dest} do not contain {DIFFERENCE_STATUS_FIELD} filed in meta data"
-                            )
-                            continue
-                        writer.writerow({
-                            'src': edge.src,
-                            'dest': edge.dest,
-                            'type': edge.type,
-                            'diff_status': edge.meta[DIFFERENCE_STATUS_FIELD],
-                            'source': edge.source
-                        })
-                        edge_count += 1
+                for edge in graph.get_all_edges():
+                    if DIFFERENCE_STATUS_FIELD not in edge.meta:
+                        logger.warning(
+                            f"Edge {edge.src} -> {edge.dest} does not contain {DIFFERENCE_STATUS_FIELD} field in meta data"
+                        )
+                        continue
+                    writer.writerow({
+                        'src': edge.src,
+                        'dest': edge.dest,
+                        'type': edge.type,
+                        'diff_status': edge.meta[DIFFERENCE_STATUS_FIELD],
+                        'source': edge.source
+                    })
+                    edge_count += 1
 
-            logger.info(f"Успешно сохранено {edge_count} связей в {file_path}")
+            logger.info(f"Successfully saved {edge_count} edges to {file_path}")
 
         except (IOError, PermissionError) as e:
-            text_error = f"Ошибка записи файла связей: {str(e)}"
+            text_error = f"Error writing edges file: {str(e)}"
             logger.critical(text_error)
             raise Exception(text_error)

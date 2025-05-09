@@ -1,10 +1,9 @@
-from collections import defaultdict
 import logging
-from typing import Dict, Set, List
+from collections import defaultdict
+from typing import Dict, Optional, Set, List
 
-from core.models.edge import Edge, TypeEdge
-from core.models.node import ADDITIONAL_NODE_TYPES, CODE_NODE_TYPES, ROOT_NODE_NAME, Node
-from src.core.utils.hash import stable_hash_from_hashes
+from core.models.edge import Edge
+from core.models.node import Node
 
 logger = logging.getLogger(__name__)
 
@@ -14,18 +13,32 @@ class Graph:
 
     def __init__(self):
         self.nodes: Dict[str, Node] = {}
-        self.edges: Dict[str, List[Edge]] = defaultdict(list)
-        self.inv_edges: Dict[str, Set[str]] = defaultdict(set)
-
-    def __contains__(self, id: str) -> bool:
-        return id in self.nodes
+        self.edges: Dict[str, Set[Edge]] = defaultdict(set)
+        self.inv_edges: Dict[str, Set[Edge]] = defaultdict(set)
 
     def add_node(self, node: Node) -> bool:
         if node.id in self.nodes:
             return False
+        self.nodes[node.id] = node
+        return True
 
+    def get_node(self, node_id: str) -> Optional[Node]:
+        return self.nodes.get(node_id)
+
+    def update_node(self, node: Node):
         self.nodes[node.id] = node
 
+    def remove_node(self, node_id: str) -> bool:
+        if node_id not in self.nodes:
+            return False
+
+        for edge in list(self.edges[node_id]):
+            self.remove_edge(edge)
+
+        for edge in list(self.inv_edges[node_id]):
+            self.remove_edge(edge)
+
+        del self.nodes[node_id]
         return True
 
     def add_edge(self, edge: Edge, with_check: bool = True) -> bool:
@@ -35,52 +48,31 @@ class Graph:
         if with_check and edge.dest not in self.nodes:
             return False
 
-        if edge.dest in self.inv_edges and edge.src in self.inv_edges[edge.dest]:
+        if edge.dest == edge.src:
             return True
 
-        self.edges[edge.src].append(edge)
-        self.inv_edges[edge.dest].add(edge.src)
+        if edge not in self.edges[edge.src]:
+            self.edges[edge.src].add(edge)
+            self.inv_edges[edge.dest].add(edge)
+            return True
 
         return True
-    
-    def calculate_all_hashes(self):
 
-        def recursive_structure_hash(cur_id: str = ROOT_NODE_NAME) -> str:
-            cur_node = self.nodes[cur_id]
+    def remove_edge(self, edge: Edge) -> bool:
+        if edge in self.edges[edge.src]:
+            self.edges[edge.src].remove(edge)
+            self.inv_edges[edge.dest].remove(edge)
+            return True
+        return False
 
-            if cur_node.type in CODE_NODE_TYPES:
-                return cur_node.hash
+    def get_edges_out(self, node_id: str) -> Set[Edge]:
+        return self.edges.get(node_id, [])
 
-            hashes = []
-            contain_edges = self.edges.get(cur_id, [])
-            for edge in contain_edges:
-                if edge.type != TypeEdge.CONTAIN:
-                    continue
-                hash_node_id = recursive_structure_hash(edge.dest)
-                hashes.append(hash_node_id)
+    def get_edges_in(self, node_id: str) -> Set[Edge]:
+        return self.inv_edges.get(node_id, set())
 
-            cur_node.hash = stable_hash_from_hashes(hashes)
-            return cur_node.hash
-        
-        def recursive_additional_hash(cur_id: str = ROOT_NODE_NAME) -> str:
-            cur_node = self.nodes[cur_id]
+    def get_all_nodes(self) -> List[Node]:
+        return list(self.nodes.values())
 
-            if cur_node.type not in ADDITIONAL_NODE_TYPES or cur_node.hash != "":
-                return cur_node.hash
-
-            hashes = []
-            contain_edges = self.edges.get(cur_id, [])
-            for edge in contain_edges:
-                if edge.type != TypeEdge.CONTAIN:
-                    continue
-                hash_node_id = recursive_additional_hash(edge.dest)
-                hashes.append(hash_node_id)
-
-            cur_node.hash = stable_hash_from_hashes(hashes)
-            return cur_node.hash
-        
-        recursive_structure_hash()
-
-        for node in self.nodes.values():
-            if node.type in ADDITIONAL_NODE_TYPES:
-                recursive_additional_hash(node.id)
+    def get_all_edges(self):
+        return [edge for edges in self.edges.values() for edge in edges]

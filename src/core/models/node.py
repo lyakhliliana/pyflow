@@ -1,9 +1,8 @@
 from dataclasses import dataclass, field
-from typing import Dict, List
-
-from core.models.edge import Edge
+from typing import Dict
 
 ROOT_NODE_NAME = "root"
+
 
 class TypeNode(str):
     DIRECTORY = 'directory'

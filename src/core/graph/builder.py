@@ -4,10 +4,11 @@ import csv
 import logging
 import os
 
-from core.models.edge import Edge, TypeEdge, TypeSourceEdge
+from core.graph.hasher import Hasher
+from core.models.edge import Edge, TypeSourceEdge
 from core.models.node import Node, TypeSourceNode
 from core.models.graph import Graph
-from src.core.graph.difference import DIFFERENCE_STATUS_FIELD
+from core.graph.difference import DIFFERENCE_STATUS_FIELD
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +104,7 @@ class CSVGraphBuilder(IGraphBuilder):
         try:
             CSVGraphBuilder._process_additional_nodes(nodes_path, graph)
             CSVGraphBuilder._process_additional_edges(file_path=edges_path, graph=graph)
-            graph.calculate_all_hashes()
+            Hasher.recalculate(graph)
 
         except FileNotFoundError as e:
             logger.critical(f"Файл не найден: {str(e)}")
@@ -194,7 +195,7 @@ class CSVGraphBuilder(IGraphBuilder):
                                 hash=row['hash'].strip(),
                                 source=row['source'].strip())
 
-                    if node.id in graph:
+                    if node.id in graph.nodes:
                         logger.info(f"Строка {row_num}: Узел {node.id} уже существует - пропуск")
                         continue
 
@@ -216,7 +217,7 @@ class CSVGraphBuilder(IGraphBuilder):
                                 hash="",
                                 source=TypeSourceNode.HAND)
 
-                    if node.id in graph:
+                    if node.id in graph.nodes:
                         logger.info(f"Строка {row_num}: Узел {node.id} уже существует - пропуск")
                         continue
 
@@ -238,7 +239,7 @@ class CSVGraphBuilder(IGraphBuilder):
                                 source=row['source'].strip())
                     node.meta[DIFFERENCE_STATUS_FIELD] = row['diff_status'].strip()
 
-                    if node.id in graph:
+                    if node.id in graph.nodes:
                         logger.info(f"Строка {row_num}: Узел {node.id} уже существует - пропуск")
                         continue
 
@@ -259,7 +260,7 @@ class CSVGraphBuilder(IGraphBuilder):
                                 type=row['type'].strip(),
                                 source=row['source'].strip())
 
-                    if edge.src in graph and edge.dest in graph:
+                    if edge.src in graph.nodes and edge.dest in graph.nodes:
                         success = graph.add_edge(edge)
                     else:
                         success = False
@@ -282,7 +283,7 @@ class CSVGraphBuilder(IGraphBuilder):
                                 type=row['type'].strip(),
                                 source=TypeSourceEdge.HAND)
 
-                    if edge.src in graph and edge.dest in graph:
+                    if edge.src in graph.nodes and edge.dest in graph.nodes:
                         success = graph.add_edge(edge)
                     else:
                         success = False
@@ -306,7 +307,7 @@ class CSVGraphBuilder(IGraphBuilder):
                                 source=row['source'].strip())
                     edge.meta[DIFFERENCE_STATUS_FIELD] = row['diff_status'].strip()
 
-                    if edge.src in graph and edge.dest in graph:
+                    if edge.src in graph.nodes and edge.dest in graph.nodes:
                         success = graph.add_edge(edge)
                     else:
                         success = False

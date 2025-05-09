@@ -1,5 +1,6 @@
 import os
 import logging
+import shutil
 from git import Repo, GitCommandError
 from pathlib import Path
 from typing import Dict, Optional
@@ -27,6 +28,9 @@ class GitHandler:
         if repo_path.exists() and not force_clone:
             logger.info(f"Using cached repository at {repo_path}")
             return repo_path
+
+        if repo_path.exists() and force_clone:
+            shutil.rmtree(repo_path)
 
         try:
             logger.info(f"Cloning repository {repo_url} to {repo_path}")
