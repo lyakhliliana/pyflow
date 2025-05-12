@@ -3,6 +3,8 @@ import logging
 import os
 from pathlib import Path
 
+from core.graph.dependency import DepenendencyExtensions
+from core.graph.filters import CommonFilter
 from core.models.graph import Graph
 from core.utils.validatie import is_git_url
 from core.utils.git_handler import GitHandler
@@ -186,4 +188,85 @@ def handle_contract(args: Namespace):
         CSVGraphExporter.save(contracted_graph, output_path)
     except Exception as e:
         print(f"error saving contracted graph {output_path}: {str(e)}")
+        return
+
+
+def handle_filter(args: Namespace):
+    source_path = Path(args.source)
+    if not source_path.exists():
+        print(f"source path is not exist: {args.source}")
+        return
+
+    output_path = Path(args.output)
+
+    try:
+        graph = CSVGraphBuilder.build(source_path)
+    except Exception as e:
+        print(f"error extract graph {source_path}: {str(e)}")
+        return
+
+    try:
+        filtered_graph = CommonFilter.apply(graph, args.node_types, args.edge_types)
+    except Exception as e:
+        print(f"error filter graph: {str(e)}")
+        return
+
+    try:
+        CSVGraphExporter.save(filtered_graph, output_path)
+    except Exception as e:
+        print(f"error saving filtered graph {output_path}: {str(e)}")
+        return
+
+
+def handle_get_used(args: Namespace):
+    source_path = Path(args.source)
+    if not source_path.exists():
+        print(f"source path is not exist: {args.source}")
+        return
+
+    output_path = Path(args.output)
+
+    try:
+        graph = CSVGraphBuilder.build(source_path)
+    except Exception as e:
+        print(f"error extract graph {source_path}: {str(e)}")
+        return
+
+    try:
+        used_graph = DepenendencyExtensions.get_used_nodes(graph, args.elements, args.depth)
+    except Exception as e:
+        print(f"error get used elements: {str(e)}")
+        return
+
+    try:
+        CSVGraphExporter.save(used_graph, output_path)
+    except Exception as e:
+        print(f"error saving used elements graph {output_path}: {str(e)}")
+        return
+
+
+def handle_get_dependent(args: Namespace):
+    source_path = Path(args.source)
+    if not source_path.exists():
+        print(f"source path is not exist: {args.source}")
+        return
+
+    output_path = Path(args.output)
+
+    try:
+        graph = CSVGraphBuilder.build(source_path)
+    except Exception as e:
+        print(f"error extract graph {source_path}: {str(e)}")
+        return
+
+    try:
+        dependent_graph = DepenendencyExtensions.get_dependent_nodes(graph, args.elements, args.depth)
+    except Exception as e:
+        print(f"error get dependent elements: {str(e)}")
+        return
+
+    try:
+        CSVGraphExporter.save(dependent_graph, output_path)
+    except Exception as e:
+        print(f"error saving dependent elements graph {output_path}: {str(e)}")
         return

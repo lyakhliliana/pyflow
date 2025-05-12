@@ -5,7 +5,7 @@ import networkx as nx
 from pyvis.network import Network
 
 from core.models.graph import Graph
-from core.models.node import CODE_NODE_TYPES, STRUCTURE_NODE_TYPES, Node, TypeNode, TypeSourceNode
+from core.models.node import CODE_NODE_TYPES, STRUCTURE_NODE_TYPES, Node
 
 PINK = "#f57676"
 GREEN = '#76f594'

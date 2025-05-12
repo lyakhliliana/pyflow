@@ -18,14 +18,29 @@ class GraphComparator:
     @staticmethod
     def get_difference(old_graph: Graph, new_graph: Graph) -> Graph:
         """
-        Compute a diff-annotated graph showing changes from old_graph to new_graph.
+        The method analyzes differences between two graphs and marks each node and edge
+        with a status in the meta field 'difference_status'. The status can be one of:
+        
+        Status values in meta['difference_status']:
+        - 'new': Element exists only in new_graph
+        - 'deleted': Element exists only in old_graph
+        - 'changed': Element exists in both graphs but has different content (determined by hash comparison)
+        - 'unchanged': Element exists in both graphs with identical content
+
+        The method processes both nodes and edges:
+        - For nodes: compares their presence and content between graphs
+        - For edges: compares their presence and relationships between graphs
+        
+        All statuses are stored in the meta field of each node and edge, allowing
+        for easy identification of what changed between the two graphs.
 
         Args:
-            old_graph (Graph): The original graph.
-            new_graph (Graph): The updated graph.
+            old_graph (Graph): The original graph to compare from
+            new_graph (Graph): The updated graph to compare to
 
         Returns:
-            Graph: A graph whose nodes and edges carry a meta flag of type TypeDiff.
+            Graph: Each element's meta['difference_status'] field indicates its status
+                   in the comparison between old_graph and new_graph.
         """
 
         result_graph = Graph()

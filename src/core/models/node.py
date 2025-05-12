@@ -16,8 +16,23 @@ class TypeNode(str):
     USE_CASE = 'use_case'
 
 
-STRUCTURE_NODE_TYPES = [TypeNode.DIRECTORY, TypeNode.FILE]
+TYPE_NODES = [
+    TypeNode.DIRECTORY,
+    TypeNode.FILE,
+    TypeNode.CLASS,
+    TypeNode.FUNC,
+    TypeNode.BODY,
+    TypeNode.ARC_ELEMENT,
+    TypeNode.USE_CASE,
+]
+
+STRUCTURE_NODE_TYPES = [
+    TypeNode.DIRECTORY,
+    TypeNode.FILE,
+]
+
 CODE_NODE_TYPES = [TypeNode.CLASS, TypeNode.FUNC, TypeNode.BODY]
+
 ADDITIONAL_NODE_TYPES = [TypeNode.ARC_ELEMENT, TypeNode.USE_CASE]
 
 

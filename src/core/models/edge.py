@@ -8,6 +8,9 @@ class TypeEdge(str):
     COUPLING = "coupling"
 
 
+TYPE_EDGES = [TypeEdge.USE, TypeEdge.CONTAIN, TypeEdge.COUPLING]
+
+
 class TypeSourceEdge(str):
     CODE = 'code'
     HAND = 'hand'

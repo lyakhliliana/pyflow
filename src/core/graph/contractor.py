@@ -4,7 +4,7 @@ import logging
 from typing import List, Set, Dict
 from core.models.graph import Graph
 from core.models.edge import Edge, TypeEdge, TypeSourceEdge
-from core.models.node import TypeNode
+from core.models.node import Node, TypeNode, TypeSourceNode
 
 logger = logging.getLogger(__name__)
 
@@ -33,10 +33,14 @@ class GraphContractor:
         """
         self.combine_other = combine_other
         for node_id in node_ids:
-            self._contract_by_node(node_id)
+            self._contract_by_node(node_id, node_ids)
+
+        if self.combine_other:
+            self._process_other()
+
         return self.con_graph
 
-    def _contract_by_node(self, node_id: str):
+    def _contract_by_node(self, node_id: str, node_ids: List[str]):
         if node_id in self.contracted_nodes:
             logger.warning(f"Node {node_id} was processed earlier.")
             return
@@ -59,7 +63,17 @@ class GraphContractor:
             self.node_contracted_in[contracted_node_id].add(node_id)
 
         for contracted_node_id in contracted_node_ids:
-            self.con_graph.remove_node(contracted_node_id)
+            edges_in = self.graph.get_edges_in(contracted_node_id)
+            arc_elems = set([
+                edge.src for edge in edges_in
+                if edge.type == TypeEdge.CONTAIN and self.graph.get_node(edge.src) == TypeNode.ARC_ELEMENT
+            ])
+            node_ids = set(node_ids)
+
+            if len(arc_elems - node_ids) > 0:
+                continue
+            else:
+                self.con_graph.remove_node(contracted_node_id)
 
     def _process_contracted_node(self, node_id: str, contracted_node_id: str):
 
@@ -96,3 +110,25 @@ class GraphContractor:
                 for src in self.node_contracted_in[edge_in.src]:
                     con_edge = Edge(src=src, dest=node_id, type=edge_in.type, source=TypeSourceEdge.HAND)
                     self.con_graph.add_edge(con_edge)
+
+    def _process_other(self):
+        other_nodes = [node.id for node in self.graph.get_all_nodes() if node.id not in self.node_contracted_in]
+
+        if len(other_nodes) == 0:
+            return
+
+        self.con_graph.add_node(
+            Node(
+                id=OTHER_NODE_NAME,
+                name=OTHER_NODE_NAME,
+                type=TypeNode.ARC_ELEMENT,
+                source=TypeSourceNode.HAND,
+            ))
+
+        for other in other_nodes:
+            self._process_contracted_node(OTHER_NODE_NAME, other)
+
+        for other in other_nodes:
+            self.contracted_nodes[OTHER_NODE_NAME].add(other)
+            self.node_contracted_in[other].add(OTHER_NODE_NAME)
+            self.con_graph.remove_node(other)

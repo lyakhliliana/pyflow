@@ -17,8 +17,12 @@ class Graph:
         self.inv_edges: Dict[str, Set[Edge]] = defaultdict(set)
 
     def add_node(self, node: Node) -> bool:
+        if node is None:
+            return False
+
         if node.id in self.nodes:
             return False
+
         self.nodes[node.id] = node
         return True
 

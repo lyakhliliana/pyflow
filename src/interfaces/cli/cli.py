@@ -1,5 +1,5 @@
 import argparse
-from interfaces.cli.handlers import handle_diff, handle_extract, handle_union, handle_visualise, handle_contract
+from interfaces.cli.handlers import handle_diff, handle_extract, handle_union, handle_visualise, handle_contract, handle_filter, handle_get_used, handle_get_dependent
 
 
 def main():
@@ -44,6 +44,41 @@ def main():
     contract_parser.add_argument("output", help="Path to the graph directory where the contracted graph will be saved")
     contract_parser.add_argument("elements", nargs="+", help="List of architectural elements to contract")
 
+    # Парсер для команды filter
+    filter_parser = subparsers.add_parser("filter", help="Filter graph based on node and edge types")
+    filter_parser.add_argument("source", help="Path to the source directory containing the graph")
+    filter_parser.add_argument("output", help="Path to the directory where the filtered graph will be saved")
+    filter_parser.add_argument("--node-types",
+                               nargs="+",
+                               default=[],
+                               help="List of node types to keep in the filtered graph")
+    filter_parser.add_argument("--edge-types",
+                               nargs="+",
+                               default=[],
+                               help="List of edge types to keep in the filtered graph")
+
+    # Парсер для команды get_used
+    get_used_parser = subparsers.add_parser("get_used", help="Get elements that are used by specified elements")
+    get_used_parser.add_argument("source", help="Path to the source graph file")
+    get_used_parser.add_argument("output", help="Path where the result will be saved")
+    get_used_parser.add_argument("elements", nargs="+", help="List of elements to find usages for")
+    get_used_parser.add_argument("-d",
+                                 "--depth",
+                                 type=int,
+                                 default=0,
+                                 help="Maximum depth of dependency search (0 for unlimited)")
+
+    # Парсер для команды get_dependent
+    get_dependent_parser = subparsers.add_parser("get_dependent", help="Get elements that depend on specified elements")
+    get_dependent_parser.add_argument("source", help="Path to the source graph file")
+    get_dependent_parser.add_argument("output", help="Path where the result will be saved")
+    get_dependent_parser.add_argument("elements", nargs="+", help="List of elements to find dependencies for")
+    get_dependent_parser.add_argument("-d",
+                                      "--depth",
+                                      type=int,
+                                      default=0,
+                                      help="Maximum depth of dependency search (0 for unlimited)")
+
     args = parser.parse_args()
 
     try:
@@ -57,6 +92,13 @@ def main():
             handle_diff(args)
         if args.command == "contract":
             handle_contract(args)
+        if args.command == "filter":
+            handle_filter(args)
+        if args.command == "get_used":
+            handle_get_used(args)
+        if args.command == "get_dependent":
+            handle_get_dependent(args)
+
     except Exception as e:
         print(f"Error: {str(e)}")
         exit(1)
