@@ -8,7 +8,7 @@ from core.models.graph import Graph
 logger = logging.getLogger(__name__)
 
 
-class DepenendencyExtensions:
+class DependencyExtensions:
 
     @staticmethod
     def get_used_nodes(graph: Graph, code_nodes: Set[str], depth: int = 0) -> Graph:

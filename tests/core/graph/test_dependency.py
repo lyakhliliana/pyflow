@@ -1,5 +1,5 @@
 import pytest
-from core.graph.dependency import DepenendencyExtensions
+from core.graph.dependency import DependencyExtensions
 from core.models.graph import Graph
 from core.models.node import Node, TypeNode
 from core.models.edge import Edge, TypeEdge, TypeSourceEdge
@@ -98,7 +98,7 @@ def complex_graph():
 
 def test_get_used_nodes_basic(complex_graph: Graph):
     """Test getting used nodes from a single starting point"""
-    result = DepenendencyExtensions.get_used_nodes(complex_graph, {"class3"})
+    result = DependencyExtensions.get_used_nodes(complex_graph, {"class3"})
     
     assert result.get_node("class3") is not None
     assert result.get_node("class2") is not None
@@ -110,7 +110,7 @@ def test_get_used_nodes_basic(complex_graph: Graph):
 
 def test_get_used_nodes_with_depth(complex_graph: Graph):
     """Test getting used nodes with depth limit"""
-    result = DepenendencyExtensions.get_used_nodes(complex_graph, {"class5"}, depth=1)
+    result = DependencyExtensions.get_used_nodes(complex_graph, {"class5"}, depth=1)
     
     assert result.get_node("class5") is not None
     assert result.get_node("class3") is not None
@@ -122,7 +122,7 @@ def test_get_used_nodes_with_depth(complex_graph: Graph):
 
 def test_get_used_nodes_multiple_starting_points(complex_graph: Graph):
     """Test getting used nodes from multiple starting points"""
-    result = DepenendencyExtensions.get_used_nodes(complex_graph, {"class4", "class6"})
+    result = DependencyExtensions.get_used_nodes(complex_graph, {"class4", "class6"})
     
     assert result.get_node("class4") is not None
     assert result.get_node("class1") is not None
@@ -133,7 +133,7 @@ def test_get_used_nodes_multiple_starting_points(complex_graph: Graph):
 
 def test_get_dependent_nodes_basic(complex_graph: Graph):
     """Test getting dependent nodes from a single starting point"""
-    result = DepenendencyExtensions.get_dependent_nodes(complex_graph, {"class1"})
+    result = DependencyExtensions.get_dependent_nodes(complex_graph, {"class1"})
     
     assert result.get_node("class1") is not None
     assert result.get_node("class4") is not None
@@ -145,7 +145,7 @@ def test_get_dependent_nodes_basic(complex_graph: Graph):
 
 def test_get_dependent_nodes_with_depth(complex_graph: Graph):
     """Test getting dependent nodes with depth limit"""
-    result = DepenendencyExtensions.get_dependent_nodes(complex_graph, {"class3"}, depth=1)
+    result = DependencyExtensions.get_dependent_nodes(complex_graph, {"class3"}, depth=1)
     
     # Should include class3 and class5 (direct dependency)
     assert result.get_node("class3") is not None
@@ -158,7 +158,7 @@ def test_get_dependent_nodes_with_depth(complex_graph: Graph):
 
 def test_get_dependent_nodes_multiple_starting_points(complex_graph: Graph):
     """Test getting dependent nodes from multiple starting points"""
-    result = DepenendencyExtensions.get_dependent_nodes(complex_graph, {"class1", "class5"})
+    result = DependencyExtensions.get_dependent_nodes(complex_graph, {"class1", "class5"})
     
     assert result.get_node("class1") is not None
     assert result.get_node("class4") is not None
@@ -167,7 +167,7 @@ def test_get_dependent_nodes_multiple_starting_points(complex_graph: Graph):
 
 def test_get_used_nodes_circular_dependency(complex_graph: Graph):
     """Test getting used nodes with circular dependencies"""
-    result = DepenendencyExtensions.get_used_nodes(complex_graph, {"class1"})
+    result = DependencyExtensions.get_used_nodes(complex_graph, {"class1"})
     
     assert result.get_node("class1") is not None
     assert result.get_node("class6") is not None

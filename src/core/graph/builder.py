@@ -12,9 +12,6 @@ from core.graph.difference import DIFFERENCE_STATUS_FIELD
 
 logger = logging.getLogger(__name__)
 
-CODE_SECTION_NAME = "code"
-UNION_SECTION_NAME = "union"
-ADDITIONAL_SECTION_NAME = "additional"
 NODES_FILE_NAME = "nodes.csv"
 EDGES_FILE_NAME = "edges.csv"
 
@@ -155,7 +152,6 @@ class CSVGraphBuilder(IGraphBuilder):
         Initializes the directory structure and empty CSV files for storing additional graph elements.
 
         Creates the following structure in the specified directory:
-        - {directory_path}/{ADDITIONAL_SECTION_NAME}/ (directory)
         - {NODES_FILE_NAME}: (CSV file with 'id,name,type' header)
         - {EDGES_FILE_NAME}: (CSV file with 'src,dest,type' header)
 
@@ -163,17 +159,15 @@ class CSVGraphBuilder(IGraphBuilder):
         if it doesn't exist (including all necessary parent directories).
 
         Args:
-            directory_path: Path to the base directory where additional files should be created.
-                        The actual files will be created in a subdirectory named {ADDITIONAL_SECTION_NAME}.
+            directory_path: Path to the directory where additional files should be created.
 
         Returns:
             None
         """
-        additional_dir = os.path.join(directory_path, ADDITIONAL_SECTION_NAME)
-        nodes_path = os.path.join(additional_dir, NODES_FILE_NAME)
-        edges_path = os.path.join(additional_dir, EDGES_FILE_NAME)
+        nodes_path = os.path.join(directory_path, NODES_FILE_NAME)
+        edges_path = os.path.join(directory_path, EDGES_FILE_NAME)
 
-        os.makedirs(additional_dir, exist_ok=True)
+        os.makedirs(directory_path, exist_ok=True)
 
         if not os.path.exists(nodes_path):
             with open(nodes_path, "w", newline="", encoding="utf-8") as nodes_file:

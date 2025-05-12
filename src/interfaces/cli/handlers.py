@@ -3,17 +3,18 @@ import logging
 import os
 from pathlib import Path
 
-from core.graph.dependency import DepenendencyExtensions
-from core.graph.filters import CommonFilter
 from core.models.graph import Graph
 from core.utils.validatie import is_git_url
 from core.utils.git_handler import GitHandler
+
 from core.graph.parsing.project import ProjectParser
 from core.graph.difference import GraphComparator
-from core.graph.builder import ADDITIONAL_SECTION_NAME, CODE_SECTION_NAME, UNION_SECTION_NAME, CSVGraphBuilder
+from core.graph.builder import CSVGraphBuilder
 from core.graph.exporter import CSVGraphExporter
 from core.graph.visualise import HtmlGraphVisualizer
 from core.graph.contractor import GraphContractor
+from core.graph.dependency import DependencyExtensions
+from core.graph.filters import CommonFilter
 
 logger = logging.getLogger(__name__)
 
@@ -23,47 +24,47 @@ DIFF_NAME = "diff.html"
 
 def handle_extract(args: Namespace):
 
-    def _prepare_source(args) -> Path:
-        if is_git_url(args.link):
-            git_dir = GitHandler.clone_repo(args.link, destination=args.output_dir, force_clone=True)
-            if git_dir is None:
-                print(f"error while cloning directory: {args.link}")
-                return
-            src_dir = os.path.join(git_dir, args.source)
-            return src_dir
+    if args.link != "":
+        if not is_git_url(args.link):
+            print(f"error validate git link: {args.link}")
+            return
 
-        source_path = Path(args.source)
-        if not source_path.exists():
-            print(f"source path is not exist: {args.source}")
-            return None
+        git_dir = GitHandler.clone_repo(args.link, destination=args.output, force_clone=True)
+        if git_dir is None:
+            print(f"error while cloning directory: {args.link}")
+            return
 
-        return source_path
+        args.source = os.path.join(git_dir, args.source)
 
-    if args.output_dir is None:
-        args.output_dir = os.getcwd()
-    graph_data_dir = os.path.join(args.output_dir, CODE_SECTION_NAME)
+    source_path = Path(args.source)
+    if not source_path.exists():
+        print(f"source path is not exist: {args.source}")
+        return None
 
-    source = _prepare_source(args)
-    if source is None:
-        return
+    if args.output is None:
+        args.output = os.getcwd()
 
     try:
-        parser = ProjectParser(source)
+        parser = ProjectParser(source_path)
         graph = parser.parse()
     except Exception as e:
         print(f"error parsing project: {args.source}: {str(e)}")
         return
 
     try:
-        CSVGraphExporter.save(graph, graph_data_dir)
+        CSVGraphExporter.save(graph, args.output)
     except Exception as e:
         print(f"error saving project graph {args.source}: {str(e)}")
         return
 
+
+def handle_init_additional(args: Namespace):
+    directory = Path(args.directory)
+
     try:
-        CSVGraphBuilder.init_additional_files(args.output_dir)
+        CSVGraphBuilder.init_additional_files(directory)
     except Exception as e:
-        print(f"error create union files in {args.output_dir}: {str(e)}")
+        print(f"error initializing additional files in {directory}: {str(e)}")
         return
 
 
@@ -105,30 +106,33 @@ def handle_visualise(args: Namespace):
 
 def handle_union(args: Namespace):
     source_path = Path(args.source)
+    additional_path = Path(args.additional)
+
     if not source_path.exists():
         print(f"source path is not exist: {args.source}")
         return
+    if not additional_path.exists():
+        print(f"additional path is not exist: {args.additional}")
+        return
 
     try:
-        graph_path = os.path.join(source_path, args.graph)
-        additional_path = os.path.join(source_path, ADDITIONAL_SECTION_NAME)
-        graph = CSVGraphBuilder.union(graph_path, additional_path)
+        graph = CSVGraphBuilder.union(source_path, additional_path)
     except Exception as e:
         print(f"error build union graph: {str(e)}")
         return
 
-    union_dir = os.path.join(args.source, UNION_SECTION_NAME)
     try:
-        CSVGraphExporter.save(graph, union_dir)
+        CSVGraphExporter.save(graph, args.output)
     except Exception as e:
-        print(f"error saving union graph {union_dir}: {str(e)}")
+        print(f"error saving union graph in {args.output}: {str(e)}")
         return
 
 
 def handle_diff(args: Namespace):
     first_path = Path(args.first_path)
     second_path = Path(args.second_path)
-    output_dir = Path(args.output_dir)
+    output_dir = Path(args.output)
+
     if not first_path.exists():
         print(f"first graph path is not exist: {args.first_path}")
         return
@@ -159,7 +163,7 @@ def handle_diff(args: Namespace):
     try:
         CSVGraphExporter.save_diff(difference_graph, output_dir)
     except Exception as e:
-        print(f"error saving difference graph {args.output_dir}: {str(e)}")
+        print(f"error saving difference graph {args.output}: {str(e)}")
         return
 
 
@@ -233,7 +237,7 @@ def handle_get_used(args: Namespace):
         return
 
     try:
-        used_graph = DepenendencyExtensions.get_used_nodes(graph, args.elements, args.depth)
+        used_graph = DependencyExtensions.get_used_nodes(graph, args.elements, args.depth)
     except Exception as e:
         print(f"error get used elements: {str(e)}")
         return
@@ -260,7 +264,7 @@ def handle_get_dependent(args: Namespace):
         return
 
     try:
-        dependent_graph = DepenendencyExtensions.get_dependent_nodes(graph, args.elements, args.depth)
+        dependent_graph = DependencyExtensions.get_dependent_nodes(graph, args.elements, args.depth)
     except Exception as e:
         print(f"error get dependent elements: {str(e)}")
         return

@@ -1,3 +1,6 @@
 gitpython==3.1.43
 pyvis==0.3.2
 yapf==0.43.0
+networkx==3.2.1
+pytest==8.0.0
+black==24.1.1
