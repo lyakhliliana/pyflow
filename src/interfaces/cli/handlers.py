@@ -210,7 +210,11 @@ def handle_filter(args: Namespace):
         return
 
     try:
-        filtered_graph = CommonFilter.apply(graph, args.node_types, args.edge_types)
+        filtered_graph = CommonFilter.apply(graph,
+                                            nodes_types=args.node_types if hasattr(args, 'node_types') else [],
+                                            edges_types=args.edge_types if hasattr(args, 'edge_types') else [],
+                                            node_reg=args.node_id_mask if hasattr(args, 'node_id_mask') else "",
+                                            inv_flag=args.inv if hasattr(args, 'inv') else False)
     except Exception as e:
         print(f"error filter graph: {str(e)}")
         return

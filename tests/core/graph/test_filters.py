@@ -230,4 +230,75 @@ def test_get_arch_elements_containing(complex_graph: Graph):
     arch3_edges = list(filtered_graph.get_edges_out("arch3"))
     assert len(arch3_edges) == 2
     assert any(e.dest == "class3" for e in arch3_edges)
-    assert any(e.dest == "func2" for e in arch3_edges) 
+    assert any(e.dest == "func2" for e in arch3_edges)
+
+def test_filter_by_node_pattern(complex_graph: Graph):
+    """Test filtering nodes by ID pattern using wildcards"""
+    # Test with * wildcard
+    filtered_graph = CommonFilter.apply(complex_graph, node_reg="class*")
+    class_nodes = ["class1", "class2", "class3"]
+    for node_id in class_nodes:
+        assert filtered_graph.get_node(node_id) is not None
+    assert filtered_graph.get_node("func1") is None
+    
+    # Test with . wildcard
+    filtered_graph = CommonFilter.apply(complex_graph, node_reg="class.")
+    assert filtered_graph.get_node("class1") is not None
+    assert filtered_graph.get_node("class2") is not None
+    assert filtered_graph.get_node("class3") is not None
+    assert filtered_graph.get_node("class10") is None
+
+def test_inverted_filtering(complex_graph: Graph):
+    """Test inverted filtering logic"""
+    filtered_graph = CommonFilter.apply(complex_graph, 
+                                      nodes_types=[TypeNode.CLASS, TypeNode.FUNC],
+                                      inv_flag=True)
+    
+    for node in filtered_graph.get_all_nodes():
+        assert node.type not in [TypeNode.CLASS, TypeNode.FUNC]
+    
+    filtered_graph = CommonFilter.apply(complex_graph,
+                                      edges_types=[TypeEdge.USE],
+                                      inv_flag=True)
+    
+    for edge in filtered_graph.get_all_edges():
+        assert edge.type != TypeEdge.USE
+    
+    filtered_graph = CommonFilter.apply(complex_graph,
+                                      node_reg="class*",
+                                      inv_flag=True)
+    
+    for node in filtered_graph.get_all_nodes():
+        assert not node.id.startswith("class")
+
+def test_combined_filtering(complex_graph: Graph):
+    """Test combining multiple filter criteria"""
+    filtered_graph = CommonFilter.apply(complex_graph,
+                                      nodes_types=[TypeNode.CLASS],
+                                      edges_types=[TypeEdge.USE],
+                                      node_reg="class[12]")
+
+    assert filtered_graph.get_node("class1") is not None
+    assert filtered_graph.get_node("class2") is not None
+    assert filtered_graph.get_node("class3") is None
+    assert filtered_graph.get_node("func1") is None
+    
+    edges = list(filtered_graph.get_all_edges())
+    assert len(edges) == 1
+    assert edges[0].src == "class2"
+    assert edges[0].dest == "class1"
+    assert edges[0].type == TypeEdge.USE
+
+def test_invalid_type_handling(complex_graph: Graph):
+    """Test handling of invalid node and edge types"""
+    filtered_graph = CommonFilter.apply(complex_graph,
+                                      nodes_types=["INVALID_TYPE", TypeNode.CLASS])
+    
+    for node in filtered_graph.get_all_nodes():
+        assert node.type == TypeNode.CLASS
+    
+    filtered_graph = CommonFilter.apply(complex_graph,
+                                      edges_types=["INVALID_TYPE", TypeEdge.USE])
+    
+    for edge in filtered_graph.get_all_edges():
+        assert edge.type == TypeEdge.USE 

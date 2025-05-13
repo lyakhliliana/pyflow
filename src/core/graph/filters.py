@@ -1,5 +1,6 @@
 from typing import Callable, List
 import logging
+import re
 
 from core.models.graph import Graph
 from core.models.node import Node, TYPE_NODES
@@ -43,17 +44,47 @@ class FilterFunc:
 class CommonFilter:
 
     @staticmethod
-    def apply(graph: Graph, nodes_types: List[str] = [], edges_types: List[str] = []) -> Graph:
-        """Filter a graph based on specified node and edge types.
+    def _matches_pattern(node_id: str, pattern: str) -> bool:
+        """Check if node ID matches the given pattern.
+        
+        Args:
+            node_id (str): The node ID to check
+            pattern (str): Pattern to match against, where:
+                * - matches any number of characters
+                . - matches exactly one character
+                
+        Returns:
+            bool: True if node_id matches the pattern, False otherwise
+        """
+        if not pattern:
+            return True
+
+        # Convert pattern to regex
+        regex_pattern = pattern.replace('.', '.').replace('*', '.*')
+        return bool(re.match(f"^{regex_pattern}$", node_id))
+
+    @staticmethod
+    def apply(graph: Graph,
+              nodes_types: List[str] = [],
+              edges_types: List[str] = [],
+              node_reg: str = "",
+              inv_flag: bool = False) -> Graph:
+        """Filter a graph based on specified node and edge types and node ID pattern.
 
         This method applies filtering to the input graph by keeping only nodes and edges
-        of the specified types. If no types are specified for either nodes or edges,
-        all nodes or edges of that category are kept.
+        of the specified types and nodes matching the given ID pattern. If no types are 
+        specified for either nodes or edges, all nodes or edges of that category are kept.
+        If no node_reg pattern is specified, all nodes are kept.
 
         Args:
             graph (Graph): The input graph to be filtered
             nodes_types (List[str], optional): List of node types to keep. Defaults to empty list.
             edges_types (List[str], optional): List of edge types to keep. Defaults to empty list.
+            node_reg (str, optional): Pattern to filter nodes by ID. Supports:
+                * - matches any number of characters
+                . - matches exactly one character
+                Defaults to empty string (no filtering).
+            inv_flag (bool, optional): If True, invert the filtering logic. Defaults to False.
 
         Returns:
             Graph: A new filtered graph containing only the specified node and edge types
@@ -69,8 +100,23 @@ class CommonFilter:
             edges_types = [t for t in edges_types if t in TYPE_EDGES]
 
         if len(nodes_types) > 0:
-            graph = FilterFunc.apply_nodes_filter(graph, lambda node: node.type in nodes_types)
+            if inv_flag:
+                graph = FilterFunc.apply_nodes_filter(graph, lambda node: node.type not in nodes_types)
+            else:
+                graph = FilterFunc.apply_nodes_filter(graph, lambda node: node.type in nodes_types)
+
+        if node_reg:
+            if inv_flag:
+                graph = FilterFunc.apply_nodes_filter(graph,
+                                                      lambda node: not CommonFilter._matches_pattern(node.id, node_reg))
+            else:
+                graph = FilterFunc.apply_nodes_filter(graph,
+                                                      lambda node: CommonFilter._matches_pattern(node.id, node_reg))
 
         if len(edges_types) > 0:
-            graph = FilterFunc.apply_edges_filter(graph, lambda edge: edge.type in edges_types)
+            if inv_flag:
+                graph = FilterFunc.apply_edges_filter(graph, lambda edge: edge.type not in edges_types)
+            else:
+                graph = FilterFunc.apply_edges_filter(graph, lambda edge: edge.type in edges_types)
+
         return graph

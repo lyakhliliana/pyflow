@@ -64,6 +64,10 @@ def main():
                                nargs="+",
                                default=[],
                                help="List of edge types to keep in the filtered graph")
+    filter_parser.add_argument("--inv",
+                               action="store_true",
+                               help="Inverse filtering - keep nodes/edges that do NOT match the specified types")
+    filter_parser.add_argument("--node-id-mask", help="Regular expression pattern to match node IDs")
 
     # Парсер для команды get_used
     get_used_parser = subparsers.add_parser("get_used", help="Get elements that are used by specified elements")
