@@ -1,7 +1,7 @@
 from core.models.edge import TypeEdge
 from core.models.graph import Graph
 from core.models.node import ADDITIONAL_NODE_TYPES, CODE_NODE_TYPES, ROOT_NODE_NAME
-from core.utils.hash import stable_hash_from_hashes
+from utils.hash import stable_hash_from_hashes
 
 
 class Hasher:

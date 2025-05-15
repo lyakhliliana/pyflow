@@ -1,9 +1,12 @@
 from copy import deepcopy
 import pytest
+
 from core.graph.difference import GraphComparator, TypeDiff, DIFFERENCE_STATUS_FIELD
+
 from core.models.graph import Graph
 from core.models.node import Node, TypeNode
-from core.models.edge import Edge, TypeEdge, TypeSourceEdge
+from core.models.edge import Edge, TypeEdge
+from core.models.common import TypeSource
 
 @pytest.fixture
 def sample_graph():
@@ -33,15 +36,15 @@ def sample_graph():
         graph.add_node(node)
     
     edges = [
-        Edge("code3", "code2", TypeEdge.USE, TypeSourceEdge.HAND),
-        Edge("dir1", "file1", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("dir1", "file2", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file1", "code1", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file1", "code2", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file2", "code3", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch1", "code1", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch1", "code2", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch2", "code3", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
+        Edge("code3", "code2", TypeEdge.USE, TypeSource.HAND),
+        Edge("dir1", "file1", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("dir1", "file2", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file1", "code1", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file1", "code2", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file2", "code3", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch1", "code1", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch1", "code2", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch2", "code3", TypeEdge.CONTAIN, TypeSource.HAND),
     ]
     
     for edge in edges:
@@ -65,7 +68,7 @@ def test_get_difference_added_node_and_edge(sample_graph: Graph):
     
     new_code = Node("code4", "code4", TypeNode.CLASS)
     new_graph.add_node(new_code)
-    new_edge = Edge("code4", "code1", TypeEdge.USE, TypeSourceEdge.HAND)
+    new_edge = Edge("code4", "code1", TypeEdge.USE, TypeSource.HAND)
     new_graph.add_edge(new_edge)
     
     diff_graph = GraphComparator.get_difference(sample_graph, new_graph)

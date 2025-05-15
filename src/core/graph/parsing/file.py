@@ -7,8 +7,9 @@ from pathlib import Path
 from typing import List, Optional, Set
 
 from core.models.dependency import Import, ImportObject
-from core.models.edge import Edge, TypeEdge, TypeSourceEdge
-from core.models.node import Node, TypeNode, TypeSourceNode
+from core.models.edge import Edge, TypeEdge
+from core.models.node import Node, TypeNode
+from core.models.common import TypeSource
 from core.models.graph import Graph
 
 NAME_BODY_NODE = "body"
@@ -87,13 +88,13 @@ class FileCodeParser(IFileCodeParser):
     def _add_class_node(self, node: ast.ClassDef):
         class_hash = self._calculate_node_hash(node)
         class_id = f"{self.rel_path_to_project_root}#{node.name}"
-        class_node = Node(id=class_id, name=node.name, type=TypeNode.CLASS, hash=class_hash, source=TypeSourceNode.CODE)
+        class_node = Node(id=class_id, name=node.name, type=TypeNode.CLASS, hash=class_hash, source=TypeSource.CODE)
         self._graph.add_node(class_node)
 
     def _add_function_node(self, node: ast.FunctionDef | ast.AsyncFunctionDef):
         func_hash = self._calculate_node_hash(node)
         func_id = f"{self.rel_path_to_project_root}#{node.name}"
-        func_node = Node(id=func_id, name=node.name, type=TypeNode.FUNC, hash=func_hash, source=TypeSourceNode.CODE)
+        func_node = Node(id=func_id, name=node.name, type=TypeNode.FUNC, hash=func_hash, source=TypeSource.CODE)
         self._graph.add_node(func_node)
 
     def _add_body_node(self, body_nodes: List[ast.AST]):
@@ -106,7 +107,7 @@ class FileCodeParser(IFileCodeParser):
                          name=NAME_BODY_NODE,
                          type=TypeNode.BODY,
                          hash=body_hash,
-                         source=TypeSourceNode.CODE)
+                         source=TypeSource.CODE)
         self._graph.add_node(body_node)
 
     def _calculate_node_hash(self, node: ast.AST) -> str:
@@ -123,6 +124,7 @@ class FileCodeParser(IFileCodeParser):
         return hasher.hexdigest()[0:8]
 
     def _find_edges(self):
+        collector = UsagesCollector()
 
         for ast_node in self._tree.body:
             current_entity: str
@@ -133,15 +135,15 @@ class FileCodeParser(IFileCodeParser):
 
             elif isinstance(ast_node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 current_entity = f"{self.rel_path_to_project_root}#{ast_node.name}"
-                used = UsagesCollector.get_function_usages(ast_node)
+                used = collector.get_function_usages(ast_node)
 
             elif isinstance(ast_node, (ast.ClassDef)):
                 current_entity = f"{self.rel_path_to_project_root}#{ast_node.name}"
-                used = UsagesCollector.get_class_usages(ast_node)
+                used = collector.get_class_usages(ast_node)
 
             else:
                 current_entity = f"{self.rel_path_to_project_root}#{NAME_BODY_NODE}"
-                used = UsagesCollector.get_body_usages(ast_node)
+                used = collector.get_body_usages(ast_node)
 
             self._form_edges(used, current_entity)
 
@@ -155,8 +157,8 @@ class FileCodeParser(IFileCodeParser):
             base_name = parts[0]
 
             local_candidate = f"{self.rel_path_to_project_root}#{base_name}"
-            if local_candidate in self._graph.get_all_nodes():
-                use_edge = Edge(src=current_entity, dest=local_candidate, type=TypeEdge.USE, source=TypeSourceEdge.CODE)
+            if local_candidate in self._graph.nodes:
+                use_edge = Edge(src=current_entity, dest=local_candidate, type=TypeEdge.USE, source=TypeSource.CODE)
                 added = self._graph.add_edge(use_edge)
                 if not added:
                     logger.warning(f"failed add edge from {current_entity} to {local_candidate}")
@@ -185,7 +187,7 @@ class FileCodeParser(IFileCodeParser):
                             break
 
                 if target:
-                    use_edge = Edge(src=current_entity, dest=target, type=TypeEdge.USE, source=TypeSourceEdge.CODE)
+                    use_edge = Edge(src=current_entity, dest=target, type=TypeEdge.USE, source=TypeSource.CODE)
                     added = self._graph.add_edge(use_edge, with_check=False)
                     if not added:
                         logger.warning(f"failed add edge from {current_entity} to {target}")

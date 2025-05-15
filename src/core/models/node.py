@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Dict
 
+from core.models.common import TypeSource
+
 ROOT_NODE_NAME = "root"
 
 
@@ -36,16 +38,11 @@ CODE_NODE_TYPES = [TypeNode.CLASS, TypeNode.FUNC, TypeNode.BODY]
 ADDITIONAL_NODE_TYPES = [TypeNode.ARC_ELEMENT, TypeNode.USE_CASE]
 
 
-class TypeSourceNode(str):
-    CODE = 'code'
-    HAND = 'hand'
-
-
 @dataclass
 class Node:
     id: str
     name: str
     type: TypeNode
     hash: str = field(default="")
-    source: TypeSourceNode = field(default=TypeSourceNode.CODE)
+    source: TypeSource = field(default=TypeSource.CODE)
     meta: Dict = field(default_factory=dict)

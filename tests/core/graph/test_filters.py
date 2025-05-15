@@ -1,7 +1,10 @@
 import pytest
+
 from core.models.graph import Graph
-from core.models.node import Node, TypeNode, TypeSourceNode
-from core.models.edge import Edge, TypeEdge, TypeSourceEdge
+from core.models.node import Node, TypeNode
+from core.models.edge import Edge, TypeEdge
+from core.models.common import TypeSource
+
 from core.graph.filters import CommonFilter
 
 @pytest.fixture
@@ -52,27 +55,27 @@ def complex_graph():
         graph.add_node(node)
     
     containment_edges = [
-        Edge("root", "src", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
-        Edge("src", "mod1", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
-        Edge("src", "mod2", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
-        Edge("mod1", "file1", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
-        Edge("mod1", "file2", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
-        Edge("mod2", "file3", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
-        Edge("file1", "class1", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
-        Edge("file1", "func1", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
-        Edge("file2", "class2", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
-        Edge("file3", "class3", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
-        Edge("file3", "func2", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
-        Edge("arch1", "class1", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
-        Edge("arch1", "func1", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
-        Edge("arch2", "class2", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
-        Edge("arch3", "class3", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
-        Edge("arch3", "func2", TypeEdge.CONTAIN, TypeSourceEdge.CODE),
+        Edge("root", "src", TypeEdge.CONTAIN, TypeSource.CODE),
+        Edge("src", "mod1", TypeEdge.CONTAIN, TypeSource.CODE),
+        Edge("src", "mod2", TypeEdge.CONTAIN, TypeSource.CODE),
+        Edge("mod1", "file1", TypeEdge.CONTAIN, TypeSource.CODE),
+        Edge("mod1", "file2", TypeEdge.CONTAIN, TypeSource.CODE),
+        Edge("mod2", "file3", TypeEdge.CONTAIN, TypeSource.CODE),
+        Edge("file1", "class1", TypeEdge.CONTAIN, TypeSource.CODE),
+        Edge("file1", "func1", TypeEdge.CONTAIN, TypeSource.CODE),
+        Edge("file2", "class2", TypeEdge.CONTAIN, TypeSource.CODE),
+        Edge("file3", "class3", TypeEdge.CONTAIN, TypeSource.CODE),
+        Edge("file3", "func2", TypeEdge.CONTAIN, TypeSource.CODE),
+        Edge("arch1", "class1", TypeEdge.CONTAIN, TypeSource.CODE),
+        Edge("arch1", "func1", TypeEdge.CONTAIN, TypeSource.CODE),
+        Edge("arch2", "class2", TypeEdge.CONTAIN, TypeSource.CODE),
+        Edge("arch3", "class3", TypeEdge.CONTAIN, TypeSource.CODE),
+        Edge("arch3", "func2", TypeEdge.CONTAIN, TypeSource.CODE),
     ]
     
     usage_edges = [
-        Edge("class2", "class1", TypeEdge.USE, TypeSourceEdge.CODE),
-        Edge("func2", "func1", TypeEdge.USE, TypeSourceEdge.CODE),
+        Edge("class2", "class1", TypeEdge.USE, TypeSource.CODE),
+        Edge("func2", "func1", TypeEdge.USE, TypeSource.CODE),
     ]
     
     for edge in containment_edges + usage_edges:

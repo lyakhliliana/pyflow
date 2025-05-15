@@ -4,8 +4,8 @@ import os
 from pathlib import Path
 
 from core.models.graph import Graph
-from core.utils.validatie import is_git_url
-from core.utils.git_handler import GitHandler
+from utils.validatie import is_git_url
+from utils.git_handler import GitHandler
 
 from core.graph.parsing.project import ProjectParser
 from core.graph.difference import GraphComparator
@@ -55,6 +55,13 @@ def handle_extract(args: Namespace):
         CSVGraphExporter.save(graph, args.output)
     except Exception as e:
         print(f"error saving project graph {args.source}: {str(e)}")
+        return
+    
+    vis_path = os.path.join(args.output, VIS_NAME)
+    try:
+        HtmlGraphVisualizer.create(graph, vis_path)
+    except Exception as e:
+        print(f"error visualize graph {source_path}: {str(e)}")
         return
 
 
@@ -126,6 +133,13 @@ def handle_union(args: Namespace):
     except Exception as e:
         print(f"error saving union graph in {args.output}: {str(e)}")
         return
+    
+    vis_path = os.path.join(args.output, VIS_NAME)
+    try:
+        HtmlGraphVisualizer.create(graph, vis_path)
+    except Exception as e:
+        print(f"error visualize graph {source_path}: {str(e)}")
+        return
 
 
 def handle_diff(args: Namespace):
@@ -193,6 +207,13 @@ def handle_contract(args: Namespace):
     except Exception as e:
         print(f"error saving contracted graph {output_path}: {str(e)}")
         return
+    
+    vis_path = os.path.join(args.output, VIS_NAME)
+    try:
+        HtmlGraphVisualizer.create(contracted_graph, vis_path)
+    except Exception as e:
+        print(f"error visualize graph {source_path}: {str(e)}")
+        return
 
 
 def handle_filter(args: Namespace):
@@ -224,6 +245,13 @@ def handle_filter(args: Namespace):
     except Exception as e:
         print(f"error saving filtered graph {output_path}: {str(e)}")
         return
+    
+    vis_path = os.path.join(args.output, VIS_NAME)
+    try:
+        HtmlGraphVisualizer.create(filtered_graph, vis_path)
+    except Exception as e:
+        print(f"error visualize graph {source_path}: {str(e)}")
+        return
 
 
 def handle_get_used(args: Namespace):
@@ -251,6 +279,13 @@ def handle_get_used(args: Namespace):
     except Exception as e:
         print(f"error saving used elements graph {output_path}: {str(e)}")
         return
+    
+    vis_path = os.path.join(args.output, VIS_NAME)
+    try:
+        HtmlGraphVisualizer.create(used_graph, vis_path)
+    except Exception as e:
+        print(f"error visualize graph {source_path}: {str(e)}")
+        return
 
 
 def handle_get_dependent(args: Namespace):
@@ -277,4 +312,11 @@ def handle_get_dependent(args: Namespace):
         CSVGraphExporter.save(dependent_graph, output_path)
     except Exception as e:
         print(f"error saving dependent elements graph {output_path}: {str(e)}")
+        return
+    
+    vis_path = os.path.join(args.output, VIS_NAME)
+    try:
+        HtmlGraphVisualizer.create(dependent_graph, vis_path)
+    except Exception as e:
+        print(f"error visualize graph {source_path}: {str(e)}")
         return

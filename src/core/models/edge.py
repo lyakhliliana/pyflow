@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Dict
 
+from core.models.common import TypeSource
+
 
 class TypeEdge(str):
     USE = 'use'
@@ -11,17 +13,12 @@ class TypeEdge(str):
 TYPE_EDGES = [TypeEdge.USE, TypeEdge.CONTAIN, TypeEdge.COUPLING]
 
 
-class TypeSourceEdge(str):
-    CODE = 'code'
-    HAND = 'hand'
-
-
 @dataclass
 class Edge:
     src: str
     dest: str
     type: TypeEdge
-    source: TypeSourceEdge = field(default=TypeSourceEdge.CODE)
+    source: TypeSource = field(default=TypeSource.CODE)
     meta: Dict = field(default_factory=dict)
 
     def __eq__(self, other) -> bool:

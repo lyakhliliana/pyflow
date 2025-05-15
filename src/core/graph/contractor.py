@@ -2,9 +2,11 @@ from collections import defaultdict
 from copy import deepcopy
 import logging
 from typing import List, Set, Dict
+
 from core.models.graph import Graph
-from core.models.edge import Edge, TypeEdge, TypeSourceEdge
-from core.models.node import Node, TypeNode, TypeSourceNode
+from core.models.edge import Edge, TypeEdge
+from core.models.node import Node, TypeNode
+from core.models.common import TypeSource
 
 logger = logging.getLogger(__name__)
 
@@ -80,9 +82,9 @@ class GraphContractor:
         if contracted_node_id in self.node_contracted_in:
             coupling_elements = self.node_contracted_in[contracted_node_id]
             for coupling_element in coupling_elements:
-                con_edge = Edge(src=node_id, dest=coupling_element, type=TypeEdge.COUPLING, source=TypeSourceEdge.HAND)
+                con_edge = Edge(src=node_id, dest=coupling_element, type=TypeEdge.COUPLING, source=TypeSource.HAND)
                 self.con_graph.add_edge(con_edge)
-                con_edge = Edge(src=coupling_element, dest=node_id, type=TypeEdge.COUPLING, source=TypeSourceEdge.HAND)
+                con_edge = Edge(src=coupling_element, dest=node_id, type=TypeEdge.COUPLING, source=TypeSource.HAND)
                 self.con_graph.add_edge(con_edge)
 
         edges_out = self.graph.get_edges_out(contracted_node_id)
@@ -90,12 +92,12 @@ class GraphContractor:
 
         for edge_out in edges_out:
             if edge_out.dest not in self.node_contracted_in:
-                con_edge = Edge(src=node_id, dest=edge_out.dest, type=edge_out.type, source=TypeSourceEdge.HAND)
+                con_edge = Edge(src=node_id, dest=edge_out.dest, type=edge_out.type, source=TypeSource.HAND)
                 self.con_graph.add_edge(con_edge)
 
             else:
                 for dest in self.node_contracted_in[edge_out.dest]:
-                    con_edge = Edge(src=node_id, dest=dest, type=edge_out.type, source=TypeSourceEdge.HAND)
+                    con_edge = Edge(src=node_id, dest=dest, type=edge_out.type, source=TypeSource.HAND)
                     self.con_graph.add_edge(con_edge)
 
         for edge_in in edges_in:
@@ -103,12 +105,12 @@ class GraphContractor:
                 continue
 
             if edge_in.src not in self.node_contracted_in:
-                con_edge = Edge(src=edge_in.src, dest=node_id, type=edge_in.type, source=TypeSourceEdge.HAND)
+                con_edge = Edge(src=edge_in.src, dest=node_id, type=edge_in.type, source=TypeSource.HAND)
                 self.con_graph.add_edge(con_edge)
 
             else:
                 for src in self.node_contracted_in[edge_in.src]:
-                    con_edge = Edge(src=src, dest=node_id, type=edge_in.type, source=TypeSourceEdge.HAND)
+                    con_edge = Edge(src=src, dest=node_id, type=edge_in.type, source=TypeSource.HAND)
                     self.con_graph.add_edge(con_edge)
 
     def _process_other(self):
@@ -122,7 +124,7 @@ class GraphContractor:
                 id=OTHER_NODE_NAME,
                 name=OTHER_NODE_NAME,
                 type=TypeNode.ARC_ELEMENT,
-                source=TypeSourceNode.HAND,
+                source=TypeSource.HAND,
             ))
 
         for other in other_nodes:

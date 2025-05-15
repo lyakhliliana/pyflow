@@ -17,6 +17,10 @@ class IGraphExporter(ABC):
     def save(graph: Graph, directory_path: str) -> None:
         pass
 
+    @staticmethod
+    @abstractmethod
+    def save_diff(graph: Graph, directory_path: str) -> None:
+        pass
 
 class CSVGraphExporter(IGraphExporter):
 

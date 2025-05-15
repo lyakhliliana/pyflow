@@ -3,12 +3,16 @@ from abc import ABC, abstractmethod
 import csv
 import logging
 import os
+from collections import deque
 
-from core.graph.hasher import Hasher
-from core.models.edge import Edge, TypeSourceEdge
-from core.models.node import Node, TypeSourceNode
+from core.models.edge import Edge
+from core.models.node import Node, TypeNode, CODE_NODE_TYPES, STRUCTURE_NODE_TYPES, ADDITIONAL_NODE_TYPES
 from core.models.graph import Graph
+from core.models.common import TypeSource
+from core.models.edge import TypeEdge
+
 from core.graph.difference import DIFFERENCE_STATUS_FIELD
+from core.graph.hasher import Hasher
 
 logger = logging.getLogger(__name__)
 
@@ -65,11 +69,11 @@ class CSVGraphBuilder(IGraphBuilder):
             CSVGraphBuilder._process_nodes(nodes_path, graph)
             CSVGraphBuilder._process_edges(edges_path, graph)
         except FileNotFoundError as e:
-            text_error = f"Файл не найден: {str(e)}"
+            text_error = f"File not found: {str(e)}"
             logger.critical(text_error)
             raise Exception(text_error)
         except csv.Error as e:
-            text_error = f"Ошибка CSV: {str(e)}"
+            text_error = f"CSV error: {str(e)}"
             logger.critical(text_error)
             raise Exception(text_error)
 
@@ -104,10 +108,10 @@ class CSVGraphBuilder(IGraphBuilder):
             Hasher.recalculate(graph)
 
         except FileNotFoundError as e:
-            logger.critical(f"Файл не найден: {str(e)}")
+            logger.critical(f"File not found: {str(e)}")
             raise
         except csv.Error as e:
-            logger.critical(f"Ошибка CSV: {str(e)}")
+            logger.critical(f"CSV error: {str(e)}")
             raise
 
         return graph
@@ -136,11 +140,11 @@ class CSVGraphBuilder(IGraphBuilder):
             CSVGraphBuilder._process_diff_nodes(nodes_path, graph)
             CSVGraphBuilder._process_diff_edges(edges_path, graph)
         except FileNotFoundError as e:
-            text_error = f"Файл не найден: {str(e)}"
+            text_error = f"File not found: {str(e)}"
             logger.critical(text_error)
             raise Exception(text_error)
         except csv.Error as e:
-            text_error = f"Ошибка CSV: {str(e)}"
+            text_error = f"CSV error: {str(e)}"
             logger.critical(text_error)
             raise Exception(text_error)
 
@@ -190,14 +194,14 @@ class CSVGraphBuilder(IGraphBuilder):
                                 source=row['source'].strip())
 
                     if node.id in graph.nodes:
-                        logger.info(f"Строка {row_num}: Узел {node.id} уже существует - пропуск")
+                        logger.info(f"Line {row_num}: Node {node.id} already exists - skipping")
                         continue
 
                     if not graph.add_node(node):
-                        logger.warning(f"Строка {row_num}: Конфликт ID узла {node.id}")
+                        logger.warning(f"Line {row_num}: Node ID conflict {node.id}")
 
                 except (KeyError, ValueError) as e:
-                    logger.error(f"Строка {row_num}: Ошибка парсинга узла - {str(e)}")
+                    logger.error(f"Line {row_num}: Node parsing error - {str(e)}")
 
     @staticmethod
     def _process_additional_nodes(file_path: str, graph: Graph) -> None:
@@ -209,17 +213,17 @@ class CSVGraphBuilder(IGraphBuilder):
                                 name=row['name'].strip(),
                                 type=row['type'].strip(),
                                 hash="",
-                                source=TypeSourceNode.HAND)
+                                source=TypeSource.HAND)
 
                     if node.id in graph.nodes:
-                        logger.info(f"Строка {row_num}: Узел {node.id} уже существует - пропуск")
+                        logger.info(f"Line {row_num}: Node {node.id} already exists - skipping")
                         continue
 
                     if not graph.add_node(node):
-                        logger.warning(f"Строка {row_num}: Конфликт ID узла {node.id}")
+                        logger.warning(f"Line {row_num}: Node ID conflict {node.id}")
 
                 except (KeyError, ValueError) as e:
-                    logger.error(f"Строка {row_num}: Ошибка парсинга узла - {str(e)}")
+                    logger.error(f"Line {row_num}: Node parsing error - {str(e)}")
 
     @staticmethod
     def _process_diff_nodes(file_path: str, graph: Graph) -> None:
@@ -234,14 +238,14 @@ class CSVGraphBuilder(IGraphBuilder):
                     node.meta[DIFFERENCE_STATUS_FIELD] = row['diff_status'].strip()
 
                     if node.id in graph.nodes:
-                        logger.info(f"Строка {row_num}: Узел {node.id} уже существует - пропуск")
+                        logger.info(f"Line {row_num}: Node {node.id} already exists - skipping")
                         continue
 
                     if not graph.add_node(node):
-                        logger.warning(f"Строка {row_num}: Конфликт ID узла {node.id}")
+                        logger.warning(f"Line {row_num}: Node ID conflict {node.id}")
 
                 except (KeyError, ValueError) as e:
-                    logger.error(f"Строка {row_num}: Ошибка парсинга узла - {str(e)}")
+                    logger.error(f"Line {row_num}: Node parsing error - {str(e)}")
 
     @staticmethod
     def _process_edges(file_path: str, graph: Graph) -> None:
@@ -261,10 +265,10 @@ class CSVGraphBuilder(IGraphBuilder):
 
                     if not success:
                         logger.error(
-                            f"Строка {row_num}: Невозможно добавить связь {edge.src}->{edge.dest} (узлы отсутствуют)")
+                            f"Line {row_num}: Cannot add edge {edge.src}->{edge.dest} (nodes missing)")
 
                 except (KeyError, ValueError) as e:
-                    logger.error(f"Строка {row_num}: Ошибка парсинга связи - {str(e)}")
+                    logger.error(f"Line {row_num}: Edge parsing error - {str(e)}")
 
     @staticmethod
     def _process_additional_edges(file_path: str, graph: Graph) -> None:
@@ -275,19 +279,22 @@ class CSVGraphBuilder(IGraphBuilder):
                     edge = Edge(src=row['src'].strip(),
                                 dest=row['dest'].strip(),
                                 type=row['type'].strip(),
-                                source=TypeSourceEdge.HAND)
+                                source=TypeSource.HAND)
 
                     if edge.src in graph.nodes and edge.dest in graph.nodes:
-                        success = graph.add_edge(edge)
+                        if graph.get_node(edge.src).type == TypeNode.ARC_ELEMENT:
+                            success = CSVGraphBuilder._add_arc_edge(edge, graph)
+                        else:
+                            success = graph.add_edge(edge)
                     else:
                         success = False
 
                     if not success:
                         logger.error(
-                            f"Строка {row_num}: Невозможно добавить связь {edge.src}->{edge.dest} (узлы отсутствуют)")
+                            f"Line {row_num}: Cannot add edge {edge.src}->{edge.dest} (nodes missing)")
 
                 except (KeyError, ValueError) as e:
-                    logger.error(f"Строка {row_num}: Ошибка парсинга связи - {str(e)}")
+                    logger.error(f"Line {row_num}: Edge parsing error - {str(e)}")
 
     @staticmethod
     def _process_diff_edges(file_path: str, graph: Graph) -> None:
@@ -308,7 +315,46 @@ class CSVGraphBuilder(IGraphBuilder):
 
                     if not success:
                         logger.error(
-                            f"Строка {row_num}: Невозможно добавить связь {edge.src}->{edge.dest} (узлы отсутствуют)")
+                            f"Line {row_num}: Cannot add edge {edge.src}->{edge.dest} (nodes missing)")
 
                 except (KeyError, ValueError) as e:
-                    logger.error(f"Строка {row_num}: Ошибка парсинга связи - {str(e)}")
+                    logger.error(f"Line {row_num}: Edge parsing error - {str(e)}")
+
+    @staticmethod
+    def _add_arc_edge(edge: Edge, graph: Graph) -> bool:
+        dest_node = graph.get_node(edge.dest)
+        if dest_node is None:
+            logger.warning(f"Destination node {edge.dest} not found in the graph")
+            return False
+
+        if dest_node.type in CODE_NODE_TYPES:
+            return graph.add_edge(edge)
+        
+        elif dest_node.type in STRUCTURE_NODE_TYPES:
+            is_success = True
+            visited = set()
+            queue = deque([dest_node.id])
+            while queue:
+                current_id = queue.popleft()
+                if current_id in visited:
+                    continue
+                visited.add(current_id)
+                current_node = graph.get_node(current_id)
+                if current_node is None:
+                    continue
+                if current_node.type in CODE_NODE_TYPES:
+                    new_edge = Edge(src=edge.src, dest=current_id, type=edge.type, source=edge.source)
+                    if not graph.add_edge(new_edge):
+                        is_success = False
+                elif current_node.type in STRUCTURE_NODE_TYPES:
+                    for out_edge in graph.get_edges_out(current_id):
+                        if out_edge.type == TypeEdge.CONTAIN:
+                            queue.append(out_edge.dest)
+            return is_success
+        
+        elif dest_node.type in ADDITIONAL_NODE_TYPES:
+            logger.warning(f"Architectural element can only be linked to code and structure elements, not to {dest_node.type}")
+            return False
+        else:
+            logger.warning(f"Unknown destination node type: {dest_node.type}")
+            return False

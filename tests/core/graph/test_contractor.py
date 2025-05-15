@@ -1,8 +1,11 @@
 import pytest
+
 from core.graph.contractor import GraphContractor
+
 from core.models.graph import Graph
 from core.models.node import Node, TypeNode
-from core.models.edge import Edge, TypeEdge, TypeSourceEdge
+from core.models.edge import Edge, TypeEdge
+from core.models.common import TypeSource
 
 @pytest.fixture
 def sample_graph():
@@ -32,15 +35,15 @@ def sample_graph():
         graph.add_node(node)
     
     edges = [
-        Edge("code3", "code2", TypeEdge.USE, TypeSourceEdge.HAND),
-        Edge("dir1", "file1", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("dir1", "file2", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file1", "code1", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file1", "code2", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file2", "code3", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch1", "code1", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch1", "code2", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch2", "code3", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
+        Edge("code3", "code2", TypeEdge.USE, TypeSource.HAND),
+        Edge("dir1", "file1", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("dir1", "file2", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file1", "code1", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file1", "code2", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file2", "code3", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch1", "code1", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch1", "code2", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch2", "code3", TypeEdge.CONTAIN, TypeSource.HAND),
     ]
     
     for edge in edges:
@@ -96,31 +99,31 @@ def complex_graph():
         graph.add_node(node)
     
     dir_edges = [
-        Edge("root", "src", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("src", "mod1", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("src", "mod2", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("mod1", "file1", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("mod1", "file2", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("mod2", "file3", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("mod2", "file4", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
+        Edge("root", "src", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("src", "mod1", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("src", "mod2", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("mod1", "file1", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("mod1", "file2", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("mod2", "file3", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("mod2", "file4", TypeEdge.CONTAIN, TypeSource.HAND),
     ]
     
     file_code_edges = [
-        Edge("file1", "code1", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file1", "code2", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file2", "code3", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file3", "code4", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file3", "code5", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file4", "code6", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
+        Edge("file1", "code1", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file1", "code2", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file2", "code3", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file3", "code4", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file3", "code5", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file4", "code6", TypeEdge.CONTAIN, TypeSource.HAND),
     ]
     
     arch_edges = [
-        Edge("arch1", "code1", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch1", "code2", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch1", "code4", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch2", "code3", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch2", "code5", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch3", "code6", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
+        Edge("arch1", "code1", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch1", "code2", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch1", "code4", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch2", "code3", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch2", "code5", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch3", "code6", TypeEdge.CONTAIN, TypeSource.HAND),
     ]
     
     for edge in dir_edges + file_code_edges + arch_edges:
@@ -184,7 +187,7 @@ def test_contract_nonexistent_node(sample_graph: Graph):
 def test_contract_with_coupling_edges(sample_graph: Graph):
     """Test contracting nodes with coupling edges between them"""
     # Add coupling edge between code1 and code2
-    edge = Edge("arch2", "code2", TypeEdge.CONTAIN, TypeSourceEdge.HAND)
+    edge = Edge("arch2", "code2", TypeEdge.CONTAIN, TypeSource.HAND)
     sample_graph.add_edge(edge)
     
     contractor = GraphContractor(sample_graph)
@@ -219,10 +222,10 @@ def test_complex_graph_contracting(complex_graph: Graph):
 def test_complex_graph_with_use_edges(complex_graph: Graph):
     """Test contracting with multiple types of edges between nodes"""
     edges = [
-        Edge("code1", "code2", TypeEdge.USE, TypeSourceEdge.HAND),
-        Edge("code2", "code3", TypeEdge.USE, TypeSourceEdge.HAND),
-        Edge("code4", "code5", TypeEdge.USE, TypeSourceEdge.HAND),
-        Edge("code5", "code6", TypeEdge.USE, TypeSourceEdge.HAND),
+        Edge("code1", "code2", TypeEdge.USE, TypeSource.HAND),
+        Edge("code2", "code3", TypeEdge.USE, TypeSource.HAND),
+        Edge("code4", "code5", TypeEdge.USE, TypeSource.HAND),
+        Edge("code5", "code6", TypeEdge.USE, TypeSource.HAND),
     ]
     
     for edge in edges:
@@ -244,9 +247,9 @@ def test_complex_graph_with_use_edges(complex_graph: Graph):
 def test_circular_dependencies(complex_graph: Graph):
     """Test contracting with circular dependencies between nodes"""
     edges = [
-        Edge("code1", "code2", TypeEdge.USE, TypeSourceEdge.HAND),
-        Edge("code2", "code3", TypeEdge.USE, TypeSourceEdge.HAND),
-        Edge("code3", "code1", TypeEdge.USE, TypeSourceEdge.HAND),
+        Edge("code1", "code2", TypeEdge.USE, TypeSource.HAND),
+        Edge("code2", "code3", TypeEdge.USE, TypeSource.HAND),
+        Edge("code3", "code1", TypeEdge.USE, TypeSource.HAND),
     ]
     
     for edge in edges:
@@ -264,9 +267,9 @@ def test_circular_dependencies(complex_graph: Graph):
 def test_complex_coupling(complex_graph: Graph):
     """Test complex coupling dependencies between nodes"""
     edges = [
-        Edge("arch1", "code5", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch1", "code6", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("code2", "code3", TypeEdge.USE, TypeSourceEdge.HAND),
+        Edge("arch1", "code5", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch1", "code6", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("code2", "code3", TypeEdge.USE, TypeSource.HAND),
     ]
     
     for edge in edges:

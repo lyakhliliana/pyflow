@@ -6,8 +6,10 @@ import os
 
 from core.graph.hasher import Hasher
 from core.graph.parsing.file import FileCodeParser
-from core.models.edge import Edge, TypeEdge, TypeSourceEdge
-from core.models.node import ROOT_NODE_NAME, Node, TypeNode, TypeSourceNode
+
+from core.models.edge import Edge, TypeEdge
+from core.models.node import ROOT_NODE_NAME, Node, TypeNode
+from core.models.common import TypeSource
 from core.models.graph import Graph
 
 logger = logging.getLogger(__name__)
@@ -53,7 +55,7 @@ class ProjectParser(IProjectParser):
                          name=ROOT_NODE_NAME,
                          type=TypeNode.DIRECTORY,
                          hash="",
-                         source=TypeSourceNode.CODE)
+                         source=TypeSource.CODE)
         self._graph.add_node(root_node)
 
         for file_path in py_files:
@@ -88,13 +90,13 @@ class ProjectParser(IProjectParser):
                                     name=part,
                                     type=TypeNode.DIRECTORY,
                                     hash="",
-                                    source=TypeSourceNode.CODE)
+                                    source=TypeSource.CODE)
                     self._graph.add_node(dir_node)
 
                     dir_edge = Edge(src=parent_node_name,
                                     dest=dir_node.id,
                                     type=TypeEdge.CONTAIN,
-                                    source=TypeSourceEdge.CODE)
+                                    source=TypeSource.CODE)
 
                     self._graph.add_edge(dir_edge)
 
@@ -106,13 +108,13 @@ class ProjectParser(IProjectParser):
                              name=path_parts[-1],
                              type=TypeNode.FILE,
                              hash="",
-                             source=TypeSourceNode.CODE)
+                             source=TypeSource.CODE)
 
             if self._graph.add_node(file_node):
                 file_edge = Edge(src=parent_node_name,
                                  dest=file_node.id,
                                  type=TypeEdge.CONTAIN,
-                                 source=TypeSourceEdge.CODE)
+                                 source=TypeSource.CODE)
                 self._graph.add_edge(file_edge)
 
         def _build_code_nodes_from_file(path: Path):
@@ -126,7 +128,7 @@ class ProjectParser(IProjectParser):
                         src=file_node_id,
                         dest=node.id,
                         type=TypeEdge.CONTAIN,
-                        source=TypeSourceEdge.CODE,
+                        source=TypeSource.CODE,
                     )
                     self._graph.add_edge(edge)
 

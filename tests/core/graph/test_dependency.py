@@ -1,8 +1,11 @@
 import pytest
+
 from core.graph.dependency import DependencyExtensions
+
 from core.models.graph import Graph
 from core.models.node import Node, TypeNode
-from core.models.edge import Edge, TypeEdge, TypeSourceEdge
+from core.models.edge import Edge, TypeEdge
+from core.models.common import TypeSource
 
 @pytest.fixture
 def complex_graph():
@@ -59,36 +62,36 @@ def complex_graph():
         graph.add_node(node)
     
     containment_edges = [
-        Edge("root", "src", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("src", "mod1", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("src", "mod2", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("mod1", "file1", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("mod1", "file2", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("mod2", "file3", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("mod2", "file4", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file1", "class1", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file1", "class2", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file2", "class3", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file3", "class4", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file3", "class5", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("file4", "class6", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
+        Edge("root", "src", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("src", "mod1", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("src", "mod2", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("mod1", "file1", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("mod1", "file2", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("mod2", "file3", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("mod2", "file4", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file1", "class1", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file1", "class2", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file2", "class3", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file3", "class4", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file3", "class5", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("file4", "class6", TypeEdge.CONTAIN, TypeSource.HAND),
     ]
     
     arch_edges = [
-        Edge("arch1", "class1", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch1", "class2", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch1", "class4", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch2", "class3", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch2", "class5", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
-        Edge("arch3", "class6", TypeEdge.CONTAIN, TypeSourceEdge.HAND),
+        Edge("arch1", "class1", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch1", "class2", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch1", "class4", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch2", "class3", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch2", "class5", TypeEdge.CONTAIN, TypeSource.HAND),
+        Edge("arch3", "class6", TypeEdge.CONTAIN, TypeSource.HAND),
     ]
     
     usage_edges = [
-        Edge("class3", "class2", TypeEdge.USE, TypeSourceEdge.HAND),
-        Edge("class4", "class1", TypeEdge.USE, TypeSourceEdge.HAND),
-        Edge("class5", "class3", TypeEdge.USE, TypeSourceEdge.HAND),
-        Edge("class6", "class5", TypeEdge.USE, TypeSourceEdge.HAND),
-        Edge("class1", "class6", TypeEdge.USE, TypeSourceEdge.HAND), 
+        Edge("class3", "class2", TypeEdge.USE, TypeSource.HAND),
+        Edge("class4", "class1", TypeEdge.USE, TypeSource.HAND),
+        Edge("class5", "class3", TypeEdge.USE, TypeSource.HAND),
+        Edge("class6", "class5", TypeEdge.USE, TypeSource.HAND),
+        Edge("class1", "class6", TypeEdge.USE, TypeSource.HAND), 
     ]
     
     for edge in containment_edges + arch_edges + usage_edges:
